@@ -247,15 +247,11 @@
 -> (A A B B B B B A A A A A A A)
 
 
-
-
 (read-corpus-lists "./wsj.list.cl" 45)
 
 (setf wsj (train-hmm (read-corpus-lists "./wsj.list.cl" 45)))
 (viterbi wsj '("No" "," "it" "was" "n't" "Black" "Monday""."))
 
  => ("UH" "," "PRP" "VBD" "RB" "NNP" "NNP" ".")
-
-
 
 |#

@@ -15,6 +15,7 @@
 		 :ldur (loop repeat n collect (om-random 10 500)))))
     cs))
 
+
 (defun normalize-values (l)
   (om-scale l 0.0 1.0))
 
@@ -29,19 +30,9 @@
 
 
 
-(defun lcs-from-llmc (llmidic)
-  (loop
-     for lmc in llmidic
-     collect (mki 'chord-seq :lmidic lmc :lonset '(50))))
 
-(defun km->3dc-lib (vecs)
-  (loop
-     for v in vecs
-     collect (3DC-from-list
-	      (mapcar 'first v)
-	      (mapcar 'second v)
-	      (mapcar 'third v)
-	      '3dc 4)))
+;; (r20-3d 4)
 
 
-(r20-3d 4)
+
+
