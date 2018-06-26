@@ -17,59 +17,167 @@
 ;;; set up a new (or specialize 3dc?) editor to visualize and navigate sets of
 ;;; data with extracted features
 ;;;
-
-
 ;;; ?? - calculate features on demand, on initialization?
-;;; 
 
-#|
 
+
+;;; UTILITY FUNCTIONS
+
+(defvar *mir-in-log-space* nil "use log space to use more bits when combining many factors")
+;; later... use factors 0->1.0 for now, easier debugging.
+
+(defun normalize-histogram (alist &optional (y-max 100))
+  (loop
+     for val in alist
+     maximize (cdr val) into max
+     finally (return 
+	       (loop
+		  for (key . val) in alist
+		  collect (cons key (float (* y-max (/ val max))))))))
+
+(defun histogram (vals &optional (normalize? 100))
+  (let ((tab '()))
+    (loop
+       for val in vals
+       do (if (assoc val tab)
+	      (incf (cdr (assoc val tab)))
+	      (setf tab (cons (cons val 1) tab))))
+    (if normalize?
+	(normalize-histogram tab normalize?)
+	tab)))
+
+
+(defun histogram->bpf (ht &optional (y-range 1.0))
+  (let ((f (mki 'bpf :decimals (if (floatp y-range)
+				   10			    ;find something sensible here
+				   0))))
+    (setf (x-points f) (mapcar #'car ht))
+    (setf (y-points f) (om* y-range (mapcar #'cdr ht)))
+    f))
 
 ;;;; PITCH STATISTICS
 
-;;;
 ;;;     P-1 Basic Pitch Histogram
-;;;
 
-;;;
+(defmethod pitch-histogram ((self chord-seq) &optional (normalize? 1.0))
+  (let ((pitches (flat (lmidic self))))
+    (histogram pitches normalize?)))
+
 ;;;     P-2 Pitch Class Histogram
-;;;
 
-;;;
+(defun pitch->pc (mc &optional (round-to 100) (pcs-in-octave 12))
+  ;; return pitch class rounded to 'round-to, modulo 'pcs, ie. (pitch->pc 7105) -> pc: 11
+  (mod (round mc round-to) pcs-in-octave))
+
+(defmethod pc-histogram ((self chord-seq) &optional (normalize? 1.0))
+  (let ((pitches (flat (lmidic self))))
+    (histogram (mapcar #'pitch->pc pitches) normalize?)))
+
 ;;;     P-3 Folded Fifths Pitch Class Histogram
-;;;
 
-;;;
+(defun reorder-pc-histogram (histogram order)
+  "reorder pc-histogram according to order (list of indexes)"
+  (mapcar #'(lambda (pc) (nth pc histogram)) order))
+
+(defmethod folded-fifths-pc-histogram ((self chord-seq) &optional (normalize? 1.0))
+  (let ((histo (pc-histogram self normalize?))
+	(cycle-of-fifths (loop
+			    repeat 12
+			    for i from 0 by 7
+			    collect (mod i 12))))
+    (reorder-pc-histogram histo cycle-of-fifths)))
+
+
 ;;;     P-4 Prevalence of Most Common Pitch
-;;;
 
-;;;
+(defun count-individuals (data)
+  "returns assoc-list of (data . count) for individual items in data"
+  (loop
+     with tab = '()
+     for v in data
+     do (if (assoc v tab)
+	    (incf (cdr (assoc v tab)))
+	    (setf tab (cons (cons v 1) tab)))
+     finally (return tab)))
+
+(defun most-common-value-factor (data)
+  (let ((N (length data))
+	(counts (count-individuals data)))
+    (float (/ (cdar (sort counts #'> :key #'cdr)) N))))
+  
+(defmethod most-common-pitch-fraction ((self chord-seq))
+  (let ((pitches (flat (lmidic self))))
+    (most-common-value-factor pitches)))
+
 ;;;     P-5 Prevalence of Most Common Pitch Class
-;;;
 
-;;;
+(defmethod most-common-pc-fraction ((self chord-seq))
+  (let ((pcs (mapcar #'pitch->pc (flat (lmidic self)))))
+    (most-common-value-factor pcs)))
+
 ;;;     P-6 Relative Prevalence of Top Pitches
-;;;
 
-;;;
+     ;; P-6 Relative Prevalence of Top Pitches: Relative frequency of the second
+     ;; most common pitch in the piece, divided by the relative frequency of the
+     ;; most common pitch.
+
+(defun two-most-common-occurences-factor (data)
+  (let ((sorted-counts (sort (count-individuals data) #'> :key #'cdr)))
+    (float
+     (/ (cdr (second sorted-counts))
+	(cdr (first sorted-counts))))))
+
+(defmethod relative-prevalence-most-common-pitches ((self chord-seq))
+  (let ((pitches (flat (lmidic self))))
+    (two-most-common-occurences-factor pitches)))
+
+
 ;;;     P-7 Relative Prevalence of Top Pitch Classes
-;;;
 
-;;;
+(defmethod relative-prevalence-most-common-pcs ((self chord-seq))
+  (let ((pcs (mapcar #'pitch->pc (flat (lmidic self)))))
+    (two-most-common-occurences-factor pcs)))
+
+
 ;;;     P-8 Interval Between Most Prevalent Pitches
-;;;
 
-;;;
+(defun interval-between-two-most-common-numbers (data)
+  (let ((sorted-counts (sort (count-individuals data) #'> :key #'cdr)))
+    (abs (- (car (first sorted-counts))
+	    (car (second sorted-counts))))))
+
+(defmethod interval-between-two-most-common-pitches ((self chord-seq))
+  (let ((pitches (flat (lmidic self))))
+    (interval-between-two-most-common-numbers pitches)))
+
 ;;;     P-9 Interval Between Most Prevalent Pitch Classes
-;;;
 
-;;;
+(defmethod interval-between-two-most-common-pcs ((self chord-seq))
+  "returns integer interval (0-12)"
+  (let ((pcs (mapcar #'pitch->pc (flat (lmidic self)))))
+    (interval-between-two-most-common-numbers pcs)))
+
 ;;;     P-10 Number of Common Pitches
-;;;
 
-;;;
+(defun count-individuals-and-total (data)
+  "count data, returns two values: (item . count) + total"
+  (loop
+     with tab = '()
+     for total from 1
+     for v in data
+     do (if (assoc v tab)
+	    (incf (cdr (assoc v tab)))
+	    (setf tab (cons (cons v 1) tab)))
+     finally (return (values tab total))))
+
+(defun number-of-common-pitches (data &optional (threshold 0.09))
+  (multiple-value-bind (counts total)
+      (count-individuals-and-total data)
+    (count-if #'(lambda (x) (>= (/ (cdr x) total) threshold))
+	      counts)))
+
 ;;;     P-11 Pitch Variety
-;;;
+
 
 ;;;
 ;;;     P-12 Pitch Class Variety
@@ -237,7 +345,6 @@
 ;;;
 
 
-|#
 
 ;;;
 ;;;
