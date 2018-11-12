@@ -30,9 +30,7 @@
 (om::fill-library 
  '((nil nil nil nil nil)))
 
-(print 
-	"
-	==============================
-OMAI - AI Tools for OM
- 	==============================
-	")
+(om::om-print "==============================" )
+(om::om-print "OMAI - AI Tools for OM" )
+(om::om-print "==============================" )
+
