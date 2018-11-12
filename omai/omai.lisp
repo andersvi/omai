@@ -29,7 +29,7 @@
 (compile&load (merge-pathnames "sources/rocchio" *load-pathname*))
 
 (om::fill-library 
- '((nil nil nil nil nil)))
+ '((nil nil (omai::text-analyzer) (omai::word-features omai::get-word-class omai::get-similarty) nil)))
 
 (om::om-print "==============================" )
 (om::om-print "OMAI - AI Tools for OM" )

@@ -5,8 +5,8 @@
  (:doc "")
  (:info
   (:created "2018/11/12 21:50:08")
-  (:modified "2018/11/12 22:37:00"))
- (:window (:size (702 671)) (:position (296 112)))
+  (:modified "2018/11/12 23:25:16"))
+ (:window (:size (702 671)) (:position (205 434)))
  (:grid nil)
  (:lock nil)
  (:boxes

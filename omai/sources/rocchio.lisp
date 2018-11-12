@@ -461,7 +461,8 @@
   ((corpus :initform nil :initarg :corpus :accessor corpus)
    (words :initform nil :initarg :words :accessor words)
    (classes :initform nil :initarg :classes :accessor classes)
-   (vs :initform nil :accessor vs)))
+   (vs :initform nil :accessor vs))
+  (:icon :omai))
       
 
 (defmethod initialize-instance :after ((self text-analyzer) &rest args)
