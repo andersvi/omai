@@ -27,10 +27,11 @@
  (:source-files 
   (:pathname (:directory (:relative "sources")) (:name "package"))
   (:pathname (:directory (:relative "sources")) (:name "features"))
+  (:pathname (:directory (:relative "sources")) (:name "rocchio"))
   )
  (:symbols 
-  (:functions )
-  (:classes ))
+  (:functions "omai::word-features" "omai::get-similarty" "omai::get-word-class")
+  (:classes "omai::text-analyzer"))
 )
 
 

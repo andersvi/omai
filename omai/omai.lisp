@@ -26,6 +26,7 @@
 
 (compile&load (merge-pathnames "sources/package" *load-pathname*))
 (compile&load (merge-pathnames "sources/features" *load-pathname*))
+(compile&load (merge-pathnames "sources/rocchio" *load-pathname*))
 
 (om::fill-library 
  '((nil nil nil nil nil)))

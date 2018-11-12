@@ -87,8 +87,8 @@
 
 ;;;     P-1 Basic Pitch Histogram
 
-(defmethod pitch-histogram ((self chord-seq) &optional (normalize? 1.0))
-  (let ((pitches (flat (lmidic self))))
+(defmethod pitch-histogram ((self om::chord-seq) &optional (normalize? 1.0))
+  (let ((pitches (om::flat (om::lmidic self))))
     (histogram pitches normalize?)))
 
 ;;;     P-2 Pitch Class Histogram
@@ -97,8 +97,8 @@
   ;; return pitch class rounded to 'round-to, modulo 'pcs, ie. (pitch->pc 7105) -> pc: 11
   (mod (round mc round-to) pcs-in-octave))
 
-(defmethod pc-histogram ((self chord-seq) &optional (normalize? 1.0))
-  (let ((pitches (flat (lmidic self))))
+(defmethod pc-histogram ((self om::chord-seq) &optional (normalize? 1.0))
+  (let ((pitches (om::flat (om::lmidic self))))
     (histogram (mapcar #'pitch->pc pitches) normalize?)))
 
 ;;; P-3 Folded Fifths Pitch Class Histogram: A feature vector consisting of bin
@@ -121,7 +121,7 @@
 			   for i from 0 by 7
 			   collect (mod i 12)))
 
-(defmethod folded-fifths-pc-histogram ((self chord-seq) &optional (normalize? 1.0))
+(defmethod folded-fifths-pc-histogram ((self om::chord-seq) &optional (normalize? 1.0))
   (let ((histo (pc-histogram self normalize?)))
     (reorder-pc-histogram histo cycle-of-fifths)))
 
@@ -142,14 +142,14 @@
 	(counts (count-individuals data)))
     (float (/ (cdar (sort counts #'> :key #'cdr)) N))))
   
-(defmethod most-common-pitch-fraction ((self chord-seq))
-  (let ((pitches (flat (lmidic self))))
+(defmethod most-common-pitch-fraction ((self om::chord-seq))
+  (let ((pitches (om::flat (om::lmidic self))))
     (most-common-value-factor pitches)))
 
 ;;;     P-5 Prevalence of Most Common Pitch Class
 
-(defmethod most-common-pc-fraction ((self chord-seq))
-  (let ((pcs (mapcar #'pitch->pc (flat (lmidic self)))))
+(defmethod most-common-pc-fraction ((self om::chord-seq))
+  (let ((pcs (mapcar #'pitch->pc (om::flat (om::lmidic self)))))
     (most-common-value-factor pcs)))
 
 ;;; P-6 Relative Prevalence of Top Pitches: Relative frequency of the second
@@ -162,14 +162,14 @@
      (/ (cdr (second sorted-counts))
 	(cdr (first sorted-counts))))))
 
-(defmethod relative-prevalence-most-common-pitches ((self chord-seq))
-  (let ((pitches (flat (lmidic self))))
+(defmethod relative-prevalence-most-common-pitches ((self om::chord-seq))
+  (let ((pitches (om::flat (om::lmidic self))))
     (two-most-common-occurences-factor pitches)))
 
 ;;;     P-7 Relative Prevalence of Top Pitch Classes
 
-(defmethod relative-prevalence-most-common-pcs ((self chord-seq))
-  (let ((pcs (mapcar #'pitch->pc (flat (lmidic self)))))
+(defmethod relative-prevalence-most-common-pcs ((self om::chord-seq))
+  (let ((pcs (mapcar #'pitch->pc (om::flat (om::lmidic self)))))
     (two-most-common-occurences-factor pcs)))
 
 
@@ -180,15 +180,15 @@
     (abs (- (car (first sorted-counts))
 	    (car (second sorted-counts))))))
 
-(defmethod interval-between-two-most-common-pitches ((self chord-seq))
-  (let ((pitches (flat (lmidic self))))
+(defmethod interval-between-two-most-common-pitches ((self om::chord-seq))
+  (let ((pitches (om::flat (om::lmidic self))))
     (interval-between-two-most-common-numbers pitches)))
 
 ;;;     P-9 Interval Between Most Prevalent Pitch Classes
 
-(defmethod interval-between-two-most-common-pcs ((self chord-seq))
+(defmethod interval-between-two-most-common-pcs ((self om::chord-seq))
   "returns integer interval (0-12)"
-  (let ((pcs (mapcar #'pitch->pc (flat (lmidic self)))))
+  (let ((pcs (mapcar #'pitch->pc (om::flat (om::lmidic self)))))
     (interval-between-two-most-common-numbers pcs)))
 
 ;;; P-10 Number of Common Pitches: Number of pitches that account individually
@@ -213,11 +213,11 @@
     (count-if #'(lambda (x) (>= (/ (cdr x) total) threshold))
 	      counts)))
 
-(defmethod number-of-common-pitches ((self chord-seq) &optional (threshold 0.09))
+(defmethod number-of-common-pitches ((self om::chord-seq) &optional (threshold 0.09))
   "P-10 Number of Common Pitches: Number of pitches that account individually
 for at least 9% of all notes.  Enharmonic equivalents are grouped together for
 the purpose of this calculation."
-  (let ((pitches (flat (lmidic self))))
+  (let ((pitches (om::flat (om::lmidic self))))
     (number-of-common-items pitches threshold)))
 
 ;;; P-11 Pitch Variety: Number of pitches that occur at least once.
@@ -228,15 +228,15 @@ the purpose of this calculation."
 (defun number-of-occurring-items (data)
   (length (remove-duplicates data)))
 
-(defmethod pitch-variety ((self chord-seq))
+(defmethod pitch-variety ((self om::chord-seq))
   "P-11 Pitch Variety: Number of pitches that occur at least once."
-  (number-of-items-occurring (flat (lmidic self))))
+  (number-of-items-occurring (om::flat (om::lmidic self))))
 
 ;;; P-12 Pitch Class Variety: Number of pitch classes that occur at least once.
 
-(defmethod pitch-class-variety ((self chord-seq))
+(defmethod pitch-class-variety ((self om::chord-seq))
   "P-11 Pitch Class Variety: Number of pitches that occur at least once."
-  (let ((pcs (mapcar #'pitch->pc (flat (lmidic self)))))
+  (let ((pcs (mapcar #'pitch->pc (om::flat (om::lmidic self)))))
     (number-of-items-occurring pcs)))
 
 ;;; P-13 Range: Difference in mc between the highest and lowest pitches.
@@ -244,8 +244,8 @@ the purpose of this calculation."
   ;; watch out for some unqualified 'range methods (staff and
   ;; maquette-params)...
 
-(defmethod range ((self chord-seq))
-  (let ((pitches (flat (lmidic self))))
+(defmethod range ((self om::chord-seq))
+  (let ((pitches (om::flat (om::lmidic self))))
     (- (apply #'max pitches) (apply #'min pitches))))
 
 ;;; P-14 Most Common Pitch: MC pitch value of the most frequently
@@ -254,13 +254,13 @@ the purpose of this calculation."
 (defun most-common-item (data)
   (sort (count-individuals data) #'> :key #'cdr))
 
-(defmethod most-common-pitch ((self chord-seq))
-  (caar (most-common-item (flat (lmidic self)))))
+(defmethod most-common-pitch ((self om::chord-seq))
+  (caar (most-common-item (om::flat (om::lmidic self)))))
 
 ;;; P-15 Mean Pitch: Mean midicent value
 
-(defmethod mean-pitch ((self chord-seq))
-  (let ((pitches (flat (lmidic self))))
+(defmethod mean-pitch ((self om::chord-seq))
+  (let ((pitches (om::flat (om::lmidic self))))
     ;; ?? perhaps round to resolution in incoming data ??
     (average pitches nil)))
 
@@ -272,27 +272,27 @@ the purpose of this calculation."
 	(N-filtered (length (remove-if-not predicate data))))
     (float (/ N-filtered N))))
 
-(defmethod importance-of-bass-register ((self chord-seq))
-  (let ((pitches (flat (lmidic self))))
+(defmethod importance-of-bass-register ((self om::chord-seq))
+  (let ((pitches (om::flat (om::lmidic self))))
     (fraction-of-passed-data #'(lambda (x) (< x 5400)) pitches)))
 
 ;;; P-17 Importance of Middle Register: Fraction of notes w. pitches between
 ;;; 5400 and 7200.
 
-(defmethod importance-of-middle-register ((self chord-seq))
-  (let ((pitches (flat (lmidic self))))
+(defmethod importance-of-middle-register ((self om::chord-seq))
+  (let ((pitches (om::flat (om::lmidic self))))
     (fraction-of-passed-data #'(lambda (x) (and (>= x 5400) (<= x 7200))) pitches)))
 
 ;;; P-18 Importance of High Register: Fraction of notes w. pitches above 7200
 
-(defmethod importance-of-high-register ((self chord-seq))
-  (let ((pitches (flat (lmidic self))))
+(defmethod importance-of-high-register ((self om::chord-seq))
+  (let ((pitches (om::flat (om::lmidic self))))
     (fraction-of-passed-data #'(lambda (x) (> x 7200)) pitches)))
 
 ;;; P-19 Most Common Pitch Class: The pitch class that occurs most
 ;;; frequently compared to other pitch classes (0->12).
 
-(defmethod most-common-pitch-class ((self chord-seq))
+(defmethod most-common-pitch-class ((self om::chord-seq))
   (pitch->pc (most-common-pitch self)))
 
 ;;; P-20 Dominant Spread: Largest number of consecutive pitch classes
@@ -323,8 +323,8 @@ predicate"
        for a in seq for b in (cdr seq)
        count (funcall #'dominant-and-more-than-9% a b))))
 
-(defmethod dominant-spread ((self chord-seq))
-  (let ((pcs (mapcar #'pitch->pc (flat (lmidic self)))))
+(defmethod dominant-spread ((self om::chord-seq))
+  (let ((pcs (mapcar #'pitch->pc (om::flat (om::lmidic self)))))
     (count-consecutive-fifths pcs 0.09)))
 
 ;;; P-21 Strong Tonal Centres: Number of isolated peaks in the fifths pitch
@@ -344,7 +344,7 @@ predicate"
 
 ;;; P-23 Glissando Prevalence: factor of notes with Pitch Bend
 
-(defmethod glissando-prevalence ((self chord-seq))
+(defmethod glissando-prevalence ((self om::chord-seq))
   "glissando-prevalence is not currently relevant for chord-seqs"
   0.0)
 
