@@ -26,7 +26,7 @@
  (:author "A. Vinjar, J. Bresson (2018)")
  (:source-files 
   (:pathname (:directory (:relative "sources")) (:name "package"))
-  (:pathname (:directory (:relative "sources")) (:name "descriptors"))
+  (:pathname (:directory (:relative "sources")) (:name "features"))
   )
  (:symbols 
   (:functions )

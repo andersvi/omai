@@ -25,7 +25,7 @@
 (om::set-lib-release 1.0 (find-library "omai"))
 
 (compile&load (merge-pathnames "sources/package" *load-pathname*))
-(compile&load (merge-pathnames "sources/descriptors" *load-pathname*))
+(compile&load (merge-pathnames "sources/features" *load-pathname*))
 
 (om::fill-library 
  '((nil nil nil nil nil)))
