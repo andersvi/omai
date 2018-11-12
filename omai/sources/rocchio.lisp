@@ -29,27 +29,32 @@
 (defparameter text (merge-pathnames "data/text.txt" (om::lib-resources-folder (om::find-library "omai"))))
 (defparameter words (merge-pathnames "data/words.txt" (om::lib-resources-folder (om::find-library "omai"))))
 (defparameter classes (merge-pathnames "data/classes.txt" (om::lib-resources-folder (om::find-library "omai"))))
-
+(defparameter test-set (merge-pathnames "data/unknown.txt" (om::lib-resources-folder (om::find-library "omai"))))
 
 ;;; create a feature vector space with all the words in the corpus
 ;;; each words registers how many time another word is in the same phrase (normalized / length pf the phrases)
 
-(defparameter vspace (length-normalize-vs (read-corpus-to-vs text words)))
+(defparameter vspace (make-vs))
+(read-words vspace words)
+(read-corpus vspace text)
 
-;;; Chech the n most important words in the feature vector
+;;; check the n most important words in the feature vector
 (print-features vspace "congo" 20)
 
-;;; Check whether words have strong similarity (= strong correlations in their feature vectors
+;;; check whether words have strong similarity (= strong correlations in their feature vectors)
 (word-similarity vspace "africa" "congo")
 (word-similarity vspace "africa" "america")
 (word-similarity vspace "butter" "america")
 
 
 ;;; CLASSIFICATION
-
 (read-classes vspace classes)
-(compute-class-centroids vspace)
-(rocchio-classify vspace)
+(rocchio-classify vspace "sheriff")
+
+(with-open-file (stream test-set :direction :input)
+  (loop for word = (read stream nil nil)
+        while word
+        collect (rocchio-classify vspace (normalize-token word))))
 
 ;; ==>
 ;;
@@ -83,25 +88,28 @@
   "Retrieves the feature vector for a given word/string."
   (gethash thing (vs-matrix vs)))
 
-(defun retrieve-vectors (vs words)
-  "Return a set of feature vectors for a given set of words."
-  (mapcar #'(lambda (w) (get-feature-vector vs w)) words))
-
 
 (defun print-features (vs thing n)
   "Prints a ranked list of n context features for a given thing."
-  (let ((sorted
-	 (loop 
-	    with vector = (get-feature-vector vs (normalize-token thing))
-	    for feat being the hash-keys of vector
-	    using (hash-value val)
-	    collect (cons val feat) into values
-	    finally (return (sort values #'> :key #'first)))))
-    ;; print the top n features:
-    (loop 
-       for i from 1 to n 
-       for (val . feat) in sorted
-       do (format t "~&~a ~a~%" feat val))))
+
+  (let ((vector (get-feature-vector vs (normalize-token thing))))
+    
+    (if vector
+        (let ((sorted
+               (loop for feat being the hash-keys of vector
+                     using (hash-value val)
+                     collect (cons feat val) into values
+                     finally (return (sort values #'> :key #'cdr)))))
+          ;; print the top n features:
+          (loop 
+           for i from 1 to n 
+           for (feat . val) in sorted
+           do (format t "~&~a ~a~%" feat val))
+    
+          sorted)
+       (format t "~&ERROR: ~S in not registered in the vector space~%" thing)
+       
+      )))
 
 
 ;; Classification data:
@@ -115,27 +123,30 @@
   (getf (gethash name (vs-classes vs)) :members))
      
 
+
 ;;;=================
-;;; SIMILARITY
+;;; INITIALIZATION WITH A LIST OF WORDS
 ;;;=================
 
+(defun normalize-token (string)
+ "Text normalization, to be applied to individual tokens."
+ (string-downcase 
+  (string-trim " ,.!?(){}[]-+@&\";:'*#" string)))
 
-(defun dot-product  (hash1 hash2)
-  "Computes the inner product of two feature vectors."
-  (loop 
-      for id1 being the hash-keys of hash1
-      for val2 = (gethash id1 hash2)
-      when val2
-      sum (* (gethash id1 hash1) val2)))
+(defmethod read-words (vs (words list))
+  (loop for word in words
+        ;; create a feature vector for each word:
+        do (setf (gethash (normalize-token word) (vs-matrix vs))
+                 (make-hash-table :test #'equal)))
+  vs)
 
+(defun wordlist-from-file (file)
+  (with-open-file (stream file :direction :input)
+    (loop for word = (read stream nil nil)
+          while word collect word)))
 
-(defun word-similarity (vs w1 w2)
-  "Computes the similarity of two word strings in the space."
-  (let ((v1 (get-feature-vector vs (normalize-token w1)))
-	(v2 (get-feature-vector vs (normalize-token w2))))
-    (when (and v1 v2)
-      (funcall (vs-similarity-fn vs) v1 v2))))
-
+(defmethod read-words (vs (words pathname))
+  (read-words vs (wordlist-from-file words)))
 
 
 ;;;=================
@@ -177,12 +188,6 @@
 ;;; INIT WITH *STOP-LIST*
 (init-stop-list *stop-list*)
 
-
-(defun normalize-token (string)
- "Text normalization, to be applied to individual tokens."
- (string-downcase 
-  (string-trim " ,.!?(){}[]-+@&\";:'*#" string)))
-
 (defun tokenize (string)
   "Splits a sequence into tokens, filters stop-words and normalizes."
   (loop for start = 0 then (+ space 1)
@@ -194,8 +199,196 @@
         until (not space)))
 
 
+;;;=================
+;;; SIMILARITY
+;;;=================
+
+(defun dot-product  (hash1 hash2)
+  "Computes the inner product of two feature vectors."
+  (loop 
+      for id1 being the hash-keys of hash1
+      for val2 = (gethash id1 hash2)
+      when val2
+      sum (* (gethash id1 hash1) val2)))
+
+
+(defun word-similarity (vs w1 w2)
+  "Computes the similarity of two word strings in the space."
+  (let ((v1 (get-feature-vector vs (normalize-token w1)))
+	(v2 (get-feature-vector vs (normalize-token w2))))
+    (when (and v1 v2)
+      (funcall (vs-similarity-fn vs) v1 v2))))
+
+
+;;;=================
+;;; VECTOR NORMALIZATION
+;;;=================
+; (euclidean-length (get-feature-vector vspace "congo"))
+
+(defun euclidean-length (feature-vector)
+  "Computes the Euclidean norm of a feature vector."
+  (sqrt
+   (loop
+      for value being each hash-value in feature-vector
+      sum (expt value 2))))
+
+(defun length-normalize-vector (hash)
+  "Destructively modifies a vector to have unit length."
+  (loop 
+      with length = (euclidean-length hash)
+      for j being the hash-keys of hash
+      using (hash-value n)
+      do (setf (gethash j hash)
+	   (/ n length)))
+  hash)
+
+(defun length-normalize-vs (vs)
+  "Normalizes all vectors in a vector space to have unit length."
+  (loop
+     for vec being the hash-values of (vs-matrix vs)
+     do (length-normalize-vector vec))
+  vs)
+
+
+
+;;;=================
+;;; LEARN
+;;;=================
+
 ;;; all words in the same lines of a given word are considered its "features"
 ;;; this function creates these vectors for a series of words
+;; record bag-of-words features from the corpus, 
+;; updating the counts in the feature vectors: 
+(defun vs-learn-line-of-text (vs line)
+  ;; nested loop to (1) find target words, and (2) for each
+  ;; target extract features and update its feature vector:
+  (loop with tokens = (tokenize line)
+        for token in tokens
+        for i from 0
+        for feat-vect = (get-feature-vector vs token)
+        when feat-vect ;; only the initialized words are considered  
+        do (loop for feature in tokens
+                 for j from 0
+                 ;;; we don't count a token occurrence as a feature of itself:
+                 unless (= i j)
+                 do (incf (gethash feature feat-vect 0)))
+        ))
+
+; Learns from corpus  
+(defmethod read-corpus (vs (corpus pathname))
+  (with-open-file (stream corpus :direction :input)
+    (loop for line = (read-line stream nil nil)
+          while line
+          do (vs-learn-line-of-text vs line))
+    )
+  (length-normalize-vs vs))
+
+(defmethod read-corpus (vs (corpus-lines list))
+  (loop for line in corpus-lines
+        do (vs-learn-line-of-text vs line))
+  (length-normalize-vs vs))
+
+
+;;;=================
+;;; CLASSIFICATION
+;;;=================
+
+(defun sum-vectors (&rest vectors)
+  (let ((sum (make-hash-table :test #'equal)))
+    (dolist (vec vectors)
+      (maphash #'(lambda (dim val)
+		   (incf (gethash dim sum 0) val))
+	       vec))
+    sum))
+          
+(defun vector-average (&rest vectors)
+  "Computes a centroid for an arbitrary number of vectors."
+  (let ((n (length vectors))
+        (sum (apply #'sum-vectors vectors)))
+    (maphash #'(lambda (dim val)
+                 (setf (gethash dim sum) (/ val n)))
+             sum)
+    sum))
+
+
+(defmethod load-classes (class-ht (classes list))
+  (loop for list in classes
+        for class = (first list)
+        for members = (mapcar #'normalize-token (second list))
+        do (setf (gethash class class-ht) (list :members members)))
+  class-ht)
+
+(defmethod load-classes (class-ht (classes pathname))
+  (with-open-file (stream classes)
+    (loop for list = (read stream nil nil)
+          for class = (first list)
+          for members = (mapcar #'normalize-token (second list))
+          while list
+          do (setf (gethash class class-ht) (list :members members)))
+    class-ht))
+
+
+(defun compute-class-centroids (vs)
+  "Compute and store the average-vectors for each class."
+  (loop 
+   with classes = (vs-classes vs)      
+   for label being the hash-keys of classes
+   using (hash-value class)
+   for words = (get-class-members label vs)
+   for vectors = (remove nil (mapcar #'(lambda (w) (get-feature-vector vs w)) words))
+   for centroid = (length-normalize-vector (apply #'vector-average vectors))
+   ;;; for each class label, store the centroid in the 
+   ;;; property list we created in `read-classes':
+   do (setf (gethash label classes)
+            (append (list :centroid centroid) class)))
+  vs)
+
+
+;;; MAIN CALL TO LOAD CLASSES
+;;; reinitializes the class vector each time 
+(defun read-classes (vs classes)
+  "Read class file and store the information in the vs structure."
+  (let ((class-ht (make-hash-table)))
+    
+    (load-classes class-ht classes)
+    (setf (vs-classes vs) class-ht)
+    
+    (compute-class-centroids vs)
+    
+    vs))
+
+
+
+(defun rocchio-classify (vs word)
+  "Classify all words labeled :unknown according to centroid distance."
+  (let* ((sim-fn (vs-similarity-fn vs))
+         (classes (vs-classes vs))
+         (vector (get-feature-vector vs word)))
+    
+    (cond ((null vector)
+           (format t "ERROR: ~&~S is not in the vector space!" word))
+          ((null classes) 
+           (format t "ERROR: no loaded classes!"))
+          (t 
+           (let ((named-centroids (loop for label being the hash-keys of classes 
+                                        collect (cons label (get-class-centroid label vs)))))
+                 (loop with max-label with max-sim = 0
+                       for (label . center) in named-centroids
+                       for sim = (funcall sim-fn vector center)
+                       when (> sim max-sim)
+                       do (setq max-label label max-sim sim)
+                       finally (return (list word max-label max-sim)))
+                 )))
+    ))
+   
+
+
+
+
+
+#|
+
+
 (defun read-corpus-to-vs (corpus wordlist)
   "Returns a vector space model based on the tokens in the corpus."
   (let ((vs (make-vs)))
@@ -233,89 +426,6 @@
     vs))
 
 
-;;;=================
-;;; VECTOR NORMALIZATION
-;;;=================
-; (euclidean-length (get-feature-vector vspace "congo"))
-
-(defun euclidean-length (feature-vector)
-  "Computes the Euclidean norm of a feature vector."
-  (sqrt
-   (loop
-      for value being each hash-value in feature-vector
-      sum (expt value 2))))
-
-(defun length-normalize-vector (hash)
-  "Destructively modifies a vector to have unit length."
-  (loop 
-      with length = (euclidean-length hash)
-      for j being the hash-keys of hash
-      using (hash-value n)
-      do (setf (gethash j hash)
-	   (/ n length)))
-  hash)
-
-(defun length-normalize-vs (vs)
-  "Normalizes all vectors in a vector space to have unit length."
-  (loop
-     for vec being the hash-values of (vs-matrix vs)
-     do (length-normalize-vector vec))
-  vs)
-
-
-;;;=================
-;;; CLASSIFICATION
-;;;=================
-
-(defun read-classes (vs file)
-  "Read class file and store the information in the vs structure."
-  (let ((classes (make-hash-table)))
-    (with-open-file (stream file)
-      (loop 
-          for list = (read stream nil nil)
-          for class = (first list)
-          for members = (mapcar #'normalize-token (second list))
-          while list
-          do (setf (gethash class classes)
-               (list :members members))
-          finally (setf (vs-classes vs) classes)))
-    vs))
-
-(defun sum-vectors (&rest vectors)
-  (let ((sum (make-hash-table :test #'equal)))
-    (dolist (vec vectors)
-      (maphash #'(lambda (dim val)
-		   (incf (gethash dim sum 0) val))
-	       vec))
-    sum))
-          
-(defun vector-average (&rest vectors)
-  "Computes a centroid for an arbitrary number of vectors."
-  (let ((n (length vectors))
-        (sum (apply #'sum-vectors vectors)))
-    (maphash #'(lambda (dim val)
-                 (setf (gethash dim sum) (/ val n)))
-             sum)
-    sum))
-
-(defun compute-class-centroids (vs)
- "Compute and store the average-vectors for each class."
- (loop 
-    with classes = (vs-classes vs)      
-    for label being the hash-keys of classes
-    using (hash-value class)
-    for words = (get-class-members label vs)
-    for vectors = (retrieve-vectors vs words)
-    for centroid = (length-normalize-vector 
-		    (apply #'vector-average vectors))
-    ;;; For each class label, store the centroid in the 
-    ;;; property list we created in `read-classes':
-    do (setf (gethash label classes)
-	     (append (list :centroid centroid) class)))
- vs)
-
-
-
 (defun rocchio-classify (vs)
   "Classify all words labeled :unknown according to centroid distance."
   (loop 
@@ -338,5 +448,5 @@
 	  when (> sim max-sim)
 	  do (setq max-label label max-sim sim)
 	  finally (return (list word max-label max-sim)))))
-
+|#
 

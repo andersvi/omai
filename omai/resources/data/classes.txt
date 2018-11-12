@@ -115,19 +115,3 @@
    philip
    edward))
 
-(:unknown
-  (fruit
-   california
-   peter 
-   egypt   
-   department
-   hiroshima
-   robert
-   butter 
-   pepper
-   asia
-   roosevelt
-   moscow
-   senator
-   university
-   sheriff))
