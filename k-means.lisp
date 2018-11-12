@@ -95,7 +95,7 @@
 ;; 		      cs)
 ;; 	    (partition (cdr observations) cs))))
 
-(defun partition (observations cs)
+(defun k-partition (observations cs)
   (loop
      for obs in observations
      collect (position
@@ -103,7 +103,7 @@
 	      cs)))
 
 (defun lloyd-km (observations clusters cs k)
-  (let ((new-clusters (partition observations cs)))
+  (let ((new-clusters (k-partition observations cs)))
     (if (equal clusters new-clusters)
 	clusters
 	(lloyd-km observations
