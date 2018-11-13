@@ -31,7 +31,7 @@
   )
  (:symbols 
   (:functions "omai::word-features" "omai::get-similarty" "omai::get-word-class")
-  (:classes "omai::text-analyzer"))
+  (:classes "omai::vector-space"))
 )
 
 

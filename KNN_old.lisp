@@ -52,9 +52,7 @@
 ;; and the slot `id-map' for storing an array recording the reverse
 ;; mapping from numerical identifiers back to strings.
 
-(defun word-count (vs)
-  "Looks up the number of words in the vector space."
-  (hash-table-count (vs-matrix vs)))
+
 
 (defun map-strings-to-ids (vs)
   ;; We'll use an array for mapping from numerical ids to strings
@@ -122,6 +120,8 @@
 
 
 
+#|
+
 (setf vspace (length-normalize-vs
 	      (read-corpus-to-vs "brown2.txt" "words.txt")))
 
@@ -147,3 +147,5 @@
 (find-knn vspace "president")
 (find-knn vspace "congo" 20)
 (find-knn vspace "salt" )
+
+|#

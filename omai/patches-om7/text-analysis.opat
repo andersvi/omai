@@ -5,27 +5,27 @@
  (:doc "")
  (:info
   (:created "2018/11/12 21:50:08")
-  (:modified "2018/11/12 23:25:16"))
- (:window (:size (702 671)) (:position (205 434)))
+  (:modified "2018/11/13 11:50:15"))
+ (:window (:size (702 671)) (:position (628 414)))
  (:grid nil)
  (:lock nil)
  (:boxes
   (:box
    (:library "omai")
-   (:reference (:symbol "TEXT-ANALYZER" "OMAI"))
+   (:reference (:symbol "VECTOR-SPACE" "OMAI"))
    (:type :object)
    (:group-id nil)
-   (:name nil)
-   (:x 162)
+   (:name "vector-space")
+   (:x 181)
    (:y 264)
-   (:w 214)
-   (:h 59)
+   (:w 210)
+   (:h 62)
    (:color nil)
    (:border nil)
    (:roundness nil)
    (:text-font (:font (:face "Calibri") (:size 12) (:style :italic)))
-   (:name nil)
-   (:display :text)
+   (:name "vector-space")
+   (:display :mini-view)
    (:showname nil)
    (:group-id nil)
    (:lock :locked)
@@ -56,276 +56,12 @@
     (:output (:name "CORPUS") (:reactive nil))
     (:output (:name "WORDS") (:reactive nil))
     (:output (:name "CLASSES") (:reactive nil)))
-   (:window (:size (nil nil)) (:position (nil nil)))
+   (:window (:size nil) (:position nil))
    (:edition-params)
    (:value
     (:object
-     (:class (:symbol "TEXT-ANALYZER" "OMAI"))
-     (:slots
-      ((:corpus
-        (:pathname
-         (:directory
-          (:absolute
-           "Users"
-           "bresson"
-           "SRC"
-           "ML-AI"
-           "omai"
-           "omai"
-           "resources"
-           "data"))
-         (:device :unspecific)
-         (:host nil)
-         (:name "text")
-         (:type "txt")))
-       (:words
-        (:list
-         "potato "
-         "food "
-         "bread "
-         "fish "
-         "eggs "
-         "grains "
-         "milk "
-         "meat "
-         "wine "
-         "beer "
-         "water "
-         "vegetables "
-         "toast "
-         "salt "
-         "tea "
-         "coffee "
-         "sauce "
-         "rice "
-         "mustard "
-         "peas "
-         "breakfast"
-         "supper"
-         "lunch"
-         "administration  "
-         "institute    "
-         "college"
-         "government      "
-         "school          "
-         "center       "
-         "corporation     "
-         "faculty            "
-         "company         "
-         "office          "
-         "organization    "
-         "association     "
-         "embassy"
-         "producer "
-         "professor "
-         "dr "
-         "mr "
-         "president "
-         "governor     "
-         "doctor "
-         "master "
-         "attorney "
-         "lord "
-         "king "
-         "chairman "
-         "director "
-         "secretary "
-         "emperor "
-         "ambassador "
-         "congressman "
-         "assistant"
-         "consultant"
-         "italy "
-         "dallas "
-         "france "
-         "america "
-         "england "
-         "germany "
-         "washington  "
-         "tennessee "
-         "china "
-         "japan "
-         "russia "
-         "pennsylvania "
-         "francisco "
-         "mississippi "
-         "philadelphia  "
-         "georgia "
-         "boston "
-         "illinois "
-         "africa "
-         "congo "
-         "laos "
-         "london "
-         "austin "
-         "vienna "
-         "carolina "
-         "michigan "
-         "arkansas"
-         "europe"
-         "lizzie  "
-         "david "
-         "bill "
-         "howard "
-         "john "
-         "johnny "
-         "roy "
-         "joe "
-         "thompson "
-         "harris "
-         "jones "
-         "jane "
-         "beethoven "
-         "lucy "
-         "mickey "
-         "harvey "
-         "jean "
-         "nixon "
-         "paul "
-         "kennedy "
-         "james"
-         "philip"
-         "edward"
-         "fruit"
-         "california"
-         "peter "
-         "egypt"
-         "department"
-         "hiroshima"
-         "robert"
-         "butter "
-         "pepper"
-         "asia"
-         "roosevelt"
-         "moscow"
-         "senator"
-         "university"
-         "minister"
-         "sheriff"))
-       (:classes
-        (:list
-         (:list
-          :foodstuff
-          (:list
-           potato
-           food
-           bread
-           fish
-           eggs
-           grains
-           milk
-           meat
-           wine
-           beer
-           water
-           vegetables
-           toast
-           salt
-           tea
-           coffee
-           sauce
-           rice
-           mustard
-           peas
-           breakfast
-           supper
-           lunch))
-         (:list
-          :institution
-          (:list
-           administration
-           institute
-           college
-           government
-           school
-           center
-           corporation
-           faculty
-           company
-           office
-           organization
-           association
-           embassy))
-         (:list
-          :title
-          (:list
-           producer
-           professor
-           dr
-           president
-           governor
-           doctor
-           master
-           attorney
-           lord
-           mr
-           king
-           chairman
-           director
-           secretary
-           emperor
-           ambassador
-           congressman
-           assistant
-           consultant
-           minister))
-         (:list
-          :place_name
-          (:list
-           italy
-           dallas
-           france
-           america
-           england
-           germany
-           washington
-           tennessee
-           china
-           japan
-           russia
-           pennsylvania
-           francisco
-           mississippi
-           philadelphia
-           georgia
-           boston
-           illinois
-           africa
-           congo
-           laos
-           london
-           austin
-           vienna
-           carolina
-           michigan
-           arkansas
-           europe))
-         (:list
-          :person_name
-          (:list
-           lizzie
-           david
-           bill
-           howard
-           john
-           johnny
-           roy
-           joe
-           thompson
-           harris
-           jones
-           jane
-           beethoven
-           lucy
-           mickey
-           harvey
-           jean
-           nixon
-           paul
-           kennedy
-           james
-           philip
-           edward))))))))
+     (:class (:symbol "VECTOR-SPACE" "OMAI"))
+     (:slots ((:corpus nil) (:words nil) (:classes nil)))))
    (:id 0))
   (:box
    (:library "omai")

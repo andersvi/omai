@@ -88,6 +88,9 @@
   "Retrieves the feature vector for a given word/string."
   (gethash thing (vs-matrix vs)))
 
+(defun word-count (vs)
+  "Looks up the number of words in the vector space."
+  (hash-table-count (vs-matrix vs)))
 
 (defun print-features (vs thing n &optional print)
   "Prints a ranked list of n context features for a given thing."
@@ -457,7 +460,7 @@
 ;;; OM OBJECT
 ;;;==================================
 
-(om::defclass! text-analyzer ()
+(om::defclass! vector-space ()
   ((corpus :initform nil :initarg :corpus :accessor corpus)
    (words :initform nil :initarg :words :accessor words)
    (classes :initform nil :initarg :classes :accessor classes)
@@ -465,22 +468,22 @@
   (:icon :omai))
       
 
-(defmethod initialize-instance :after ((self text-analyzer) &rest args)
+(defmethod initialize-instance :after ((self vector-space) &rest args)
   (setf (vs self) (make-vs))
   (read-words (vs self) (words self))
   (read-corpus (vs self) (corpus self))
   (read-classes (vs self) (classes self))
   self)
 
-(om::defmethod! word-features ((ta text-analyzer) (word string) (n integer))
+(om::defmethod! word-features ((ta vector-space) (word string) (n integer))
   :icon :omai
   :initvals '(nil nil 10)
   (print-features (vs ta) word n nil))
 
-(om::defmethod! get-similarty ((ta text-analyzer) (word1 string) (word2 string))
+(om::defmethod! get-similarty ((ta vector-space) (word1 string) (word2 string))
   :icon :omai
   (word-similarity (vs ta) word1 word2))
 
-(om::defmethod! get-word-class ((ta text-analyzer) (word string))
+(om::defmethod! get-word-class ((ta vector-space) (word string))
   :icon :omai
   (rocchio-classify (vs ta) word))
