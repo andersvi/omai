@@ -70,11 +70,11 @@
 
 
 (defun histogram->bpf (ht &optional (y-range 1.0))
-  (let ((f (mki 'bpf :decimals (if (floatp y-range)
-				   10			    ;find something sensible here
-				   0))))
-    (setf (x-points f) (mapcar #'car ht))
-    (setf (y-points f) (om* y-range (mapcar #'cdr ht)))
+  (let ((f (om::mki 'om::bpf :decimals (if (floatp y-range)
+					   10	   ;find something sensible here
+					   0))))
+    (setf (om::x-points f) (mapcar #'car ht))
+    (setf (om::y-points f) (om::om* y-range (mapcar #'cdr ht)))
     f))
 
 
@@ -222,22 +222,19 @@ the purpose of this calculation."
 
 ;;; P-11 Pitch Variety: Number of pitches that occur at least once.
 
-;; (defun number-of-items-occurring (data)
-;;   (length (count-individuals data)))
-
 (defun number-of-occurring-items (data)
   (length (remove-duplicates data)))
 
 (defmethod pitch-variety ((self om::chord-seq))
   "P-11 Pitch Variety: Number of pitches that occur at least once."
-  (number-of-items-occurring (om::flat (om::lmidic self))))
+  (number-of-occurring-items (om::flat (om::lmidic self))))
 
 ;;; P-12 Pitch Class Variety: Number of pitch classes that occur at least once.
 
 (defmethod pitch-class-variety ((self om::chord-seq))
   "P-11 Pitch Class Variety: Number of pitches that occur at least once."
   (let ((pcs (mapcar #'pitch->pc (om::flat (om::lmidic self)))))
-    (number-of-items-occurring pcs)))
+    (number-of-occurring-items pcs)))
 
 ;;; P-13 Range: Difference in mc between the highest and lowest pitches.
 
@@ -262,7 +259,7 @@ the purpose of this calculation."
 (defmethod mean-pitch ((self om::chord-seq))
   (let ((pitches (om::flat (om::lmidic self))))
     ;; ?? perhaps round to resolution in incoming data ??
-    (average pitches nil)))
+    (om::average pitches nil)))
 
 ;;; P-16 Importance of Bass Register: Fraction of notes with pitch below 5400.
 
@@ -299,9 +296,9 @@ the purpose of this calculation."
 ;;; separated by perfect 5ths that each individually account for at least 9%
 ;;; of the total notes in the piece.
 
-;; AV: a bit confused about this spec....
+;; ... AV is a bit confused about this spec....
 
-(defun item-occuring-more-than-threshold-p (item data threshold)
+(defun item-N-above-threshold-p (item data threshold)
   "predicate to check whether item is occuring more often then a
    threshold (factor) in data"
   (multiple-value-bind (counts total)
@@ -316,8 +313,8 @@ the purpose of this calculation."
   "predicate takes 2 args, returns how many consecutive items in seq matching
 predicate"
   (flet ((dominant-and-more-than-9% (a b)
-	   (and (item-occuring-more-than-threshold-p a seq threshold)
-		(item-occuring-more-than-threshold-p b seq threshold)
+	   (and (item-N-above-threshold-p a seq threshold)
+		(item-N-above-threshold-p b seq threshold)
 		(is-perfect-fifth-p a b))))
     (loop
        for a in seq for b in (cdr seq)
@@ -342,6 +339,11 @@ predicate"
 ;;; metadata indicates that it is minor. Defaults to 0 if the key signature
 ;;; is unknown.
 
+
+(defmethod major-or-minor ((self om::chord-seq))
+  "major-minor extraction is not currently implemented for chord-seqs"
+  0.0)
+
 ;;; P-23 Glissando Prevalence: factor of notes with Pitch Bend
 
 (defmethod glissando-prevalence ((self om::chord-seq))
@@ -349,22 +351,29 @@ predicate"
   0.0)
 
 
-;;; P-24 Average Range of Glissandos: Average range of MIDI Pitch Bends,
-;;; where "range" is defined as the greatest value of the absolute
-;;; difference between 64 and the second data byte of all MIDI Pitch Bend
-;;; messages falling between the Note On and Note Off messages of any note
-;;; in the piece. Set to 0 if there are no MIDI Pitch Bends in the piece.
+;;; P-24 Average Range of Glissandos: Average range of Pitch Bends
 
-;;; P-25 Vibrato Prevalence: Number of pitched notes that have associated
-;;; MIDI Pitch Bend messages change direction at least twice in connection
-;;; with the note in question, divided by the total number of pitched Note
-;;; Ons in the piece.
+(defmethod glissando-average-range ((self om::chord-seq))
+  "average glissando range is not currently relevant for chord-seqs"
+  0.0)
 
-;;; P-26 Microtone Prevalence: Number of pitched notes that are each
-;;; associated with exactly one MIDI Pitch Bend message, divided by the
-;;; total number of pitched Note Ons in the piece. Set to 0 if there are no
-;;; pitched Note Ons in the piece.
+;;; P-25 Vibrato Prevalence: 
 
+(defmethod vibrato-prevalence ((self om::chord-seq))
+  "vibrato prevalence is not currently relevant for chord-seqs"
+  0.0)
+
+
+;;; P-26 Microtone Prevalence: fraction of notes with mc-value diverting from
+;;; tempered chromatic scale with more than a threshold (default 10 mc)
+
+(defmethod microtone-prevalence ((self om::chord-seq) &optional (threshold 10))
+  "P-26 Microtone Prevalence: fraction of notes with mc-value diverting from
+tempered chromatic scale with more than a threshold (default 10 mc)"
+  (let ((pitches (om::flat (om::lmidic self))))
+    (fraction-of-passed-data
+     #'(lambda (x) (< threshold (mod x 100) (- 100 threshold)))
+     pitches)))
 
 ;;;; MELODIC FEATURES
 
