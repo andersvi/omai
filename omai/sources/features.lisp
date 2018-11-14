@@ -399,17 +399,16 @@ intervals are treated as identical."
 			 (om::flat (om::lmidic self)))))
     (populate-histogram pitches)))
 
-;;; M-2 Most Common Melodic Interval: Number of semitones corresponding to the
-;;; most frequently occurring melodic interval.
 
 (defmethod most-common-melodic-interval ((self om::chord-seq))
+  "M-2 Most Common Melodic Interval: Number of semitones corresponding to the
+most frequently occurring melodic interval."
   (let ((intervals (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
     (caar (most-common-item intervals))))
 
-;;; M-3 Mean Melodic Interval: Mean average (in semitones) of the intervals
-;;; involved in each of the melodic intervals in the piece.
-
 (defmethod mean-melodic-interval ((self om::chord-seq))
+  "M-3 Mean Melodic Interval: Mean average (in semitones) of the intervals
+involved in each of the melodic intervals in the piece."
   (let ((intervals (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
     ;; ?? round to resolution in incoming data ??
     (round (om::average intervals nil))))
@@ -417,12 +416,20 @@ intervals are treated as identical."
 ;;; M-4 Number of Common Melodic Intervals: Number of different melodic intervals
 ;;; that each account individually for at least 9% of all melodic intervals.
 
-;;; M-5 Distance Between Most Prevalent Melodic Intervals: Absolute value of the
-;;; difference (in semitones) between the most common and second most common melodic
-;;; intervals in the piece.
+
+(defmethod distance-betweeen-two-most-common-melodic-intervals ((self om::chord-seq))
+  "M-5 Distance Between Most Prevalent Melodic Intervals: Absolute value of the
+difference (in semitones) between the most common and second most common melodic
+intervals in the piece."
+  (let* ((intervals (om::om-abs (om::x->dx (om::flat (om::lmidic self)))))
+	 (sorted-by-occurence (most-common-item intervals)))
+    (let ((a (caar sorted-by-occurence))
+	  (b (caadr sorted-by-occurence)))
+      (abs (- b a)))))
 
 ;;; M-6 Prevalence of Most Common Melodic Interval: Fraction of all melodic
 ;;; intervals that corresponds to the most common melodic interval.
+
 
 ;;; M-7 Relative Prevalence of Most Common Melodic Intervals: Relative frequency of
 ;;; the second most common melodic interval in the piece, divided by the relative
