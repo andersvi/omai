@@ -399,8 +399,12 @@ intervals are treated as identical."
 			 (om::flat (om::lmidic self)))))
     (populate-histogram pitches)))
 
-;;; M-2 Most Common Melodic Interval: Number of semitones corresponding to the most
-;;; frequently occurring melodic interval.
+;;; M-2 Most Common Melodic Interval: Number of semitones corresponding to the
+;;; most frequently occurring melodic interval.
+
+(defmethod most-common-melodic-interval ((self om::chord-seq))
+  (let ((intervals (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
+    (caar (most-common-item intervals))))
 
 ;;; M-3 Mean Melodic Interval: Mean average (in semitones) of the intervals involved
 ;;; in each of the melodic intervals in the piece.
