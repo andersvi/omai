@@ -406,8 +406,13 @@ intervals are treated as identical."
   (let ((intervals (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
     (caar (most-common-item intervals))))
 
-;;; M-3 Mean Melodic Interval: Mean average (in semitones) of the intervals involved
-;;; in each of the melodic intervals in the piece.
+;;; M-3 Mean Melodic Interval: Mean average (in semitones) of the intervals
+;;; involved in each of the melodic intervals in the piece.
+
+(defmethod mean-melodic-interval ((self om::chord-seq))
+  (let ((intervals (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
+    ;; ?? round to resolution in incoming data ??
+    (round (om::average intervals nil))))
 
 ;;; M-4 Number of Common Melodic Intervals: Number of different melodic intervals
 ;;; that each account individually for at least 9% of all melodic intervals.
