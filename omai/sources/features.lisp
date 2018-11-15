@@ -305,17 +305,14 @@ the purpose of this calculation."
       (count-individuals-and-total data)
     (>= (/ (cdr (assoc item counts)) total) threshold)))
 
-(defun is-perfect-fifth-p (a b)
-  ;; operates on pitch classes, 0-12
-  (= (abs (- a b)) 7))
-
 (defun count-consecutive-fifths (seq &optional (threshold 0.09))
-  "predicate takes 2 args, returns how many consecutive items in seq matching
-predicate"
+  "count consecutive fifths, but only if this particular step
+makes up more than 'threshold' percent (factor) of data"
   (flet ((dominant-and-more-than-9% (a b)
 	   (and (item-N-above-threshold-p a seq threshold)
 		(item-N-above-threshold-p b seq threshold)
-		(is-perfect-fifth-p a b))))
+		;; operate on pitch classes, 0-12:
+		(= (abs (- a b)) 7))))
     (loop
        for a in seq for b in (cdr seq)
        count (funcall #'dominant-and-more-than-9% a b))))
@@ -416,16 +413,34 @@ involved in each of the melodic intervals in the piece."
 ;;; M-4 Number of Common Melodic Intervals: Number of different melodic intervals
 ;;; that each account individually for at least 9% of all melodic intervals.
 
+(defun count-items-above-threshold (data &optional (threshold 0.09))
+  (let ((total-N (length data))
+	(item-counts (most-common-item data)))
+    (count-if #'(lambda (item) (>= (/ (cdr item) total-N) threshold))
+	      item-counts)))
+
+(defmethod number-of-common-melodic-intervals ((self om::chord-seq))
+  "M-4 Number of Common Melodic Intervals: Number of different melodic intervals
+that each account individually for at least 9% of all melodic intervals."
+  (let ((threshold 0.09))				    ; = 9%
+    (count-items-above-threshold
+     (om::om-abs (om::x->dx (om::flat (om::lmidic self))))
+     threshold)))
+
+;;; M-5 
+
+(defun distance-betweeen-two-most-common-items (data)
+  (let* ((intervals-by-occurence (most-common-item data))
+	 (a (caar intervals-by-occurence))
+	 (b (caadr intervals-by-occurence)))
+    (abs (- b a))))
 
 (defmethod distance-betweeen-two-most-common-melodic-intervals ((self om::chord-seq))
   "M-5 Distance Between Most Prevalent Melodic Intervals: Absolute value of the
 difference (in semitones) between the most common and second most common melodic
 intervals in the piece."
-  (let* ((intervals (om::om-abs (om::x->dx (om::flat (om::lmidic self)))))
-	 (sorted-by-occurence (most-common-item intervals)))
-    (let ((a (caar sorted-by-occurence))
-	  (b (caadr sorted-by-occurence)))
-      (abs (- b a)))))
+  (distance-betweeen-two-most-common-items
+   (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
 
 ;;; M-6 Prevalence of Most Common Melodic Interval: Fraction of all melodic
 ;;; intervals that corresponds to the most common melodic interval.
@@ -525,3 +540,4 @@ intervals in the piece."
 ;;; - interval between successive notes
 ;;; - integrated over more than 2 notes, ie: 1-3, 1-N
 ;;; - autocorrelation, factor of repeatedness/patterns
+
