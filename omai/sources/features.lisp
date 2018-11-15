@@ -452,9 +452,10 @@ intervals in the piece."
     (/ (cdr most-common) (apply #'+ (mapcar #'cdr all-the-rest)))))
 
 (defmethod prevalence-of-most-common-melodic-interval ((self om::chord-seq))
+  "M-6 Prevalence of Most Common Melodic Interval: Fraction of all melodic
+intervals that corresponds to the most common melodic interval."
   (let ((intervals (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
     (fraction-of-most-common-in-data intervals)))
-
 
 ;;; M-7 Relative Prevalence of Most Common Melodic Intervals: Relative frequency of
 ;;; the second most common melodic interval in the piece, divided by the relative
