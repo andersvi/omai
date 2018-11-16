@@ -49,13 +49,23 @@
 ;; later... use factors 0->1.0 for now, easier debugging.
 
 (defun normalize-histogram (alist &optional (y-max 100))
+  ;; if y-max is t, normalize to relative factors where sum of factors = 1.0;
+  ;; if y-max is a number, normalize maximum y => y-max
   (loop
-     for val in alist
-     maximize (cdr val) into max
-     finally (return 
-	       (loop
-		  for (key . val) in alist
-		  collect (cons key (float (* y-max (/ val max))))))))
+     for item in alist
+     for val = (cdr item)
+     maximize val into max
+     sum val into total
+     finally (return
+	       (if y-max				    ;do some normalization
+		   (mapc #'(lambda (item)
+			     (rplacd item (if (numberp y-max)
+					      ;; largest y -> max-y
+					      (float (* y-max (/ (cdr item) max)))
+					      ;; factors summing to 1.0
+					      (float (/ (cdr item) total)))))
+			 alist)
+		   alist))))
 
 (defun histogram (vals &optional (normalize? 100))
   (let ((tab '()))
