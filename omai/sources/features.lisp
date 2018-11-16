@@ -461,6 +461,20 @@ intervals that corresponds to the most common melodic interval."
 ;;; the second most common melodic interval in the piece, divided by the relative
 ;;; frequency of the most common melodic interval.
 
+(defun relative-prevalence-of-two-most-common-in-data (data)
+  (let* ((sorted-items (most-common-item data))
+	 (first (car sorted-items))
+	 (second (cadr sorted-items)))
+    (/ (cdr second) (cdr first))))
+
+(defmethod relative-prevalence-of-most-common-intervals ((self om::chord-seq))
+  "M-7 Relative Prevalence of Most Common Melodic Intervals: Relative frequency of
+the second most common melodic interval in the piece, divided by the relative
+frequency of the most common melodic interval."
+  (let ((intervals (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
+    (relative-prevalence-of-two-most-common-in-data intervals)))
+
+
 ;;; M-8 Amount of Arpeggiation: Fraction of melodic intervals that are repeated
 ;;; notes, minor thirds, major thirds, perfect fifths, minor sevenths, major
 ;;; sevenths, octaves, minor tenths or major tenths. This is only a very approximate
