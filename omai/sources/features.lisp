@@ -389,23 +389,23 @@ tempered chromatic scale with more than a threshold (default 10 mc)"
 ;;; normalized bin magnitudes of occuring melodic intervals.  Rising and falling
 ;;; intervals are treated as identical.
 
-(defun populate-histogram (vals &optional (normalize 100))
+(defun populate-interval-histogram (intervals &optional (normalize 100))
   ;; expects intervals between 0->127
   (let ((tab (loop for i from 0 to 127 collect (cons i 0))))
-    (loop
-       for (a b) on vals
-       while (and a b)
-       do (incf (cdr (assoc (abs (- b a)) tab))))
-    (setf tab (normalize-histogram tab normalize))))
+    (mapcar #'(lambda (int)
+		(if (assoc int tab :test #'=)
+		    (incf (cdr (assoc int tab :test #'=)))
+		    (error "interval ~A is not 0->127" int)))
+	    intervals)
+    (normalize-histogram tab normalize)))
 
 (defmethod melodic-interval-histogram ((self om::chord-seq))
   "M-1 Melodic Interval Histogram: A feature vector consisting of the
 normalized bin magnitudes of occuring melodic intervals.  Rising and falling
 intervals are treated as identical."
   (let ((pitches (mapcar #'(lambda (x) (round x 100))
-			 (om::flat (om::lmidic self)))))
-    (populate-histogram pitches)))
-
+			 (om::om-abs (om::x->dx (om::flat (om::lmidic self)))))))
+    (populate-interval-histogram pitches t)))
 
 (defmethod most-common-melodic-interval ((self om::chord-seq))
   "M-2 Most Common Melodic Interval: Number of semitones corresponding to the
@@ -489,6 +489,27 @@ frequency of the most common melodic interval."
 ;;; notes, minor thirds, major thirds, perfect fifths, minor sevenths, major
 ;;; sevenths, octaves, minor tenths or major tenths. This is only a very approximate
 ;;; measure of the amount of arpeggiation in the music, of course.
+
+(defun fraction-of-items-in-data (items wanted-items &key (test '=))
+  (loop for (key . val) in items
+     when (find key wanted-items :test test)
+     sum val into sum-of-fractions
+     finally (return sum-of-fractions)))
+
+(defun arpeggiation-factor (data)
+  (let ((tab (populate-interval-histogram data t))
+	;; repeated notes, minor thirds, major thirds, perfect fifths, minor sevenths, major sevenths, octaves, minor
+	;; tenths or major tenths :
+	(arpeggiato-intervals '(0 3 4 7 10 11 12 15 16)))
+    (fraction-of-items-in-data tab arpeggiato-intervals)))
+
+(defmethod amount-of-arpeggiation ((self om::chord-seq))
+  "M-8 Amount of Arpeggiation: Fraction of melodic intervals that are repeated
+notes, minor thirds, major thirds, perfect fifths, minor sevenths, major
+sevenths, octaves, minor tenths or major tenths. This is only a very approximate
+measure of the amount of arpeggiation in the music, of course."
+  (let ((intervals (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
+    (arpeggiation-factor (mapcar #'(lambda (i) (round i 100)) intervals))))
 
 
 ;;; M-9 Repeated Notes: Fraction of melodic intervals that correspond to repeated
