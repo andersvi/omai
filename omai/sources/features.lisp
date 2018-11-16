@@ -496,11 +496,8 @@ frequency of the most common melodic interval."
      sum val into sum-of-fractions
      finally (return sum-of-fractions)))
 
-(defun arpeggiation-factor (data)
-  (let ((tab (populate-interval-histogram data t))
-	;; repeated notes, minor thirds, major thirds, perfect fifths, minor sevenths, major sevenths, octaves, minor
-	;; tenths or major tenths :
-	(arpeggiato-intervals '(0 3 4 7 10 11 12 15 16)))
+(defun arpeggiation-factor (data arpeggiato-intervals)
+  (let ((tab (populate-interval-histogram data t)))
     (fraction-of-items-in-data tab arpeggiato-intervals)))
 
 (defmethod amount-of-arpeggiation ((self om::chord-seq))
@@ -508,36 +505,108 @@ frequency of the most common melodic interval."
 notes, minor thirds, major thirds, perfect fifths, minor sevenths, major
 sevenths, octaves, minor tenths or major tenths. This is only a very approximate
 measure of the amount of arpeggiation in the music, of course."
-  (let ((intervals (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
-    (arpeggiation-factor (mapcar #'(lambda (i) (round i 100)) intervals))))
+  (let ((intervals (mapcar #'(lambda (x) (round x 100))
+			   (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
+	(look-for '(0 3 4 7 10 11 12 15 16)))
+    (arpeggiation-factor intervals look-for)))
 
 
 ;;; M-9 Repeated Notes: Fraction of melodic intervals that correspond to repeated
 ;;; notes.
 
+(defmethod repeated-notes ((self om::chord-seq))
+  "M-9 Repeated Notes: Fraction of melodic intervals that correspond to repeated notes."
+  (let ((intervals (mapcar #'(lambda (x) (round x 100))
+			   (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
+	(look-for '(0)))
+    (arpeggiation-factor intervals look-for)))
+
 ;;; M-10 Chromatic Motion: Fraction of melodic intervals that correspond to a
 ;;; semitone.
+
+(defmethod chromatic-motion ((self om::chord-seq))
+  "M-10 Chromatic Motion: Fraction of melodic intervals that correspond to a semitone."
+  (let ((intervals (mapcar #'(lambda (x) (round x 100))
+			   (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
+	(look-for '(1)))
+    (arpeggiation-factor intervals look-for)))
 
 ;;; M-11 Stepwise Motion: Fraction of melodic intervals that correspond to a minor
 ;;; or major second.
 
+(defmethod stepwise-motion ((self om::chord-seq))
+  "M-11 Stepwise Motion: Fraction of melodic intervals that correspond to a minor or major second."
+  (let ((intervals (mapcar #'(lambda (x) (round x 100))
+			   (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
+	(look-for '(1 2)))
+    (arpeggiation-factor intervals look-for)))
+
 ;;; M-12 Melodic Thirds: Fraction of melodic intervals that are major or minor
 ;;; thirds.
+
+(defmethod melodic-thirds ((self om::chord-seq))
+  "M-12 Melodic Thirds: Fraction of melodic intervals that are major or minor thirds."
+  (let ((intervals (mapcar #'(lambda (x) (round x 100))
+			   (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
+	(look-for '(3 4)))
+    (arpeggiation-factor intervals look-for)))
 
 ;;; M-13 Melocid Perfect Fourths: Fraction of melodic intervals that are perfect
 ;;; fourths.
 
+(defmethod melodic-fourths ((self om::chord-seq))
+  "M-13 Melocid Perfect Fourths: Fraction of melodic intervals that are perfect fourths."
+  (let ((intervals (mapcar #'(lambda (x) (round x 100))
+			   (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
+	(look-for '(5)))
+    (arpeggiation-factor intervals look-for)))
+
 ;;; M-14 Melodic Tritones: Fraction of melodic intervals that are tritones.
 
+(defmethod melodic-tritones ((self om::chord-seq))
+  "M-14 Melodic Tritones: Fraction of melodic intervals that are tritones."
+  (let ((intervals (mapcar #'(lambda (x) (round x 100))
+			   (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
+	(look-for '(6)))
+    (arpeggiation-factor intervals look-for)))
+
 ;;; M-15 Melodic Fifths: Fraction of melodic intervals that are perfect fifths.
+
+(defmethod melodic-fifths ((self om::chord-seq))
+  "M-15 Melodic Fifths: Fraction of melodic intervals that are perfect fifths."
+  (let ((intervals (mapcar #'(lambda (x) (round x 100))
+			   (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
+	(look-for '(7)))
+    (arpeggiation-factor intervals look-for)))
 
 ;;; M-16 Melodic Sixths: Fraction of melodic intervals that are major or minor
 ;;; sixths.
 
+(defmethod melodic-sixths ((self om::chord-seq))
+  "M-16 Melodic Sixths: Fraction of melodic intervals that are major or minor sixths."
+  (let ((intervals (mapcar #'(lambda (x) (round x 100))
+			   (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
+	(look-for '(8 9)))
+    (arpeggiation-factor intervals look-for)))
+
 ;;; M-17 Melodic Sevenths: Fraction of melodic intervals that are major or minor
 ;;; sevenths.
 
+(defmethod melodic-sevenths ((self om::chord-seq))
+  "M-17 Melodic Sevenths: Fraction of melodic intervals that are major or minor sevenths."
+  (let ((intervals (mapcar #'(lambda (x) (round x 100))
+			   (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
+	(look-for '(10 11)))
+    (arpeggiation-factor intervals look-for)))
+
 ;;; M-18 Melodic Octaves: Fraction of melodic intervals that are octaves.
+
+(defmethod melodic-octaves ((self om::chord-seq))
+  "M-18 Melodic Octaves: Fraction of melodic intervals that are octaves."
+  (let ((intervals (mapcar #'(lambda (x) (round x 100))
+			   (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
+	(look-for '(12)))
+    (arpeggiation-factor intervals look-for)))
 
 ;;; M-19 Melodic Large Intervals: Fraction of melodic intervals greater than one
 ;;; octave.
