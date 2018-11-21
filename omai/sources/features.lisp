@@ -500,6 +500,13 @@ frequency of the most common melodic interval."
   (let ((tab (populate-interval-histogram data t)))
     (fraction-of-items-in-data tab arpeggiato-intervals)))
 
+(defun fraction-of-matches-in-data (items &key (test '=))
+  ;; to measure matches on a predicate
+  (loop for (key . val) in items
+     when (funcall test key)
+     sum val into sum-of-fractions
+     finally (return sum-of-fractions)))
+
 (defmethod amount-of-arpeggiation ((self om::chord-seq))
   "M-8 Amount of Arpeggiation: Fraction of melodic intervals that are repeated
 notes, minor thirds, major thirds, perfect fifths, minor sevenths, major
@@ -611,10 +618,19 @@ measure of the amount of arpeggiation in the music, of course."
 ;;; M-19 Melodic Large Intervals: Fraction of melodic intervals greater than one
 ;;; octave.
 
+(defmethod melodic-large-intervals ((self om::chord-seq))
+  "M-19 Melodic Large Intervals: Fraction of melodic intervals greater than one octave."
+  (let* ((intervals (mapcar #'(lambda (x) (round x 100))
+			    (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
+	 (tab (populate-interval-histogram intervals t)))
+    (fraction-of-matches-in-data tab :test #'(lambda (x) (> x 12)))))
+
 ;;; M-20 Minor Major Melodic Third Ratio: Combined fraction of all melodic intervals
 ;;; that are minor thirds, divided by the combined fraction of all melodic intervals
 ;;; that are major thirds. Set to 0 if there are no melodic minor thirds or melodic
 ;;; major thirds.
+
+
 
 ;;; M-21 Melodic Embellishments: Fraction of all notes that are surrounded on both
 ;;; sides by MIDI Note Ons on the same MIDI channel that have durations at least
