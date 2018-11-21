@@ -631,6 +631,19 @@ measure of the amount of arpeggiation in the music, of course."
 ;;; major thirds.
 
 
+(defmethod melodic-minor-major-third-ratio ((self om::chord-seq))
+  "M-20 Minor<->Major Melodic Third Ratio: Combined fraction of all melodic intervals
+that are minor thirds, divided by the combined fraction of all melodic intervals
+that are major thirds."
+  (let* ((intervals (mapcar #'(lambda (x) (round x 100))
+			    (om::om-abs (om::x->dx (om::flat (om::lmidic self))))))
+	 (tab (populate-interval-histogram intervals t))
+	 (minor-thirds (cdr (nth 3 tab)))
+	 (major-thirds (cdr (nth 4 tab))))
+    (or (and (plusp minor-thirds) (plusp major-thirds)
+	     ;; AV: should this instead perhaps return a factor 0->1.0?
+	     (/ minor-thirds major-thirds))
+	0)))
 
 ;;; M-21 Melodic Embellishments: Fraction of all notes that are surrounded on both
 ;;; sides by MIDI Note Ons on the same MIDI channel that have durations at least
