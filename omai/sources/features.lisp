@@ -93,6 +93,9 @@
 ;;; http://jmir.sourceforge.net/jSymbolic.html as suggested in Cory McKays
 ;;; thesis: "Automatic Music Classification with jMIR"
 
+;;; TODO :: the extraction of melodic features does not currently consider chords
+
+
 ;;;; PITCH STATISTICS
 
 ;;;     P-1 Basic Pitch Histogram
@@ -632,14 +635,33 @@ that are major thirds."
 	 (minor-thirds (cdr (nth 3 tab)))
 	 (major-thirds (cdr (nth 4 tab))))
     (or (and (plusp minor-thirds) (plusp major-thirds)
-	     ;; AV: should this instead perhaps return a factor 0->1.0?
+	     ;; AV: should this perhaps ensure a factor 0->1.0?
 	     (/ minor-thirds major-thirds))
 	0)))
 
-;;; M-21 Melodic Embellishments: Fraction of all notes that are surrounded on both
-;;; sides by MIDI Note Ons on the same MIDI channel that have durations at least
-;;; three times as long as the central note. Set to 0 if there are no notes in the
-;;; piece.
+;;; M-21 Melodic Embellishments: Fraction of all notes that are surrounded on
+;;; both sides by notes with durations at least three times as long as the
+;;; central note. Set to 0 if there are no notes in the piece.
+
+(defmethod melodic-embellishments ((self om::chord-seq))
+  "M-21 Melodic Embellishments: Fraction of all notes that are surrounded on
+both sides by notes with durations at least three times as long as the
+central note. Set to 0 if there are no notes in the piece."
+  (let ((durs (om::flat (om::ldur self))))
+    (loop
+       with N = (length durs)
+       with embellishments = 0
+       for (a b c) on durs
+       while c
+       when (and (<=  (* 3 b) a)
+		 (<=  (* 3 b) c))
+       do (incf embellishments)
+       and
+       collect (list a b c) into utliste
+       finally (return (float (/ embellishments N))))))
+
+;; (melodic-embellishments (om::testcs2))
+
 
 ;;; M-22 Direction of Melodic Motion: Fraction of melodic intervals that are rising
 ;;; in pitch. Set to zero if no rising or falling melodic intervals are found.
