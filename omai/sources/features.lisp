@@ -684,19 +684,108 @@ intervals are found."
 ;;; this feature as for the Melodic Interval Histogram. Set to 0 if no melodic arcs
 ;;; are found.
 
+(defun direction-count (dirs dir-counts previous-dir N-current-dir)
+  ;; dirs is a list of steps, ie: melodic directions
+  (if (null dirs)
+      (nreverse (cons (1+ N-current-dir) dir-counts))
+      (let* ((current-dir (car dirs))
+	     (peak? (minusp (* current-dir previous-dir)))) ;change in direction
+	(direction-count (cdr dirs)
+			 (if peak? (cons (1+ N-current-dir) dir-counts) dir-counts)
+			 ;; if 0, continue counting until change of dir
+			 (if (zerop current-dir) previous-dir current-dir)
+			 (if peak? 0 (1+ N-current-dir))))))
+
+;; (let ((aaa '(1 1 1 0 -1 -1 0 0 -1 1 -1 -1 -1)))
+;;   (direction-count (cdr aaa) '() (car aaa) 0))
+
+(defun average-arc-length (dirs)
+  (let ((counts (direction-count (cdr dirs) '() (car dirs) 0)))
+    (float (/ (apply #'+ counts)
+	      (length counts)))))
+
+(defmethod average-length-of-melodic-arcs ((self om::chord-seq))
+  "M-23 Average Length of Melodic Arcs: Average number of notes that separate
+melodic peaks and troughs.  Set to 0 if no melodic arcs are found."
+  (let ((intervals (om::x->dx (mc->semitones (om::lmidic self)))))
+    (if (zerop (apply #'+ intervals))
+	0
+	(average-arc-length intervals))))
+
 ;;; M-24 Average Interval Spanned by Melodic Arcs: Average melodic interval (in
 ;;; semitones) separating the top note of melodic peaks and the bottom note of
-;;; adjacent melodic troughs. Similar assumptions are made in the calculation of
-;;; this feature as for the Melodic Interval Histogram.
+;;; adjacent melodic troughs.
 
-;;; M-25 Melodic Pitch Variety: Average number of notes that go by in a MIDI channel
-;;; before a note's pitch is repeated (including the repeated note itself). This is
-;;; calculated across each channel individually before being combined. Notes that
-;;; occur simultaneously on the same MIDI tick are only counted as one note for the
-;;; purpose of this calculation. Notes that do not recur after 16 notes in the same
-;;; channel are not included in this calculation. Set to 0 if there are no
-;;; qualifying repeated notes in the piece.
+(defun strip-fringe-zeroes (vals)
+  (loop
+     for x in vals
+     for j from 1
+     unless (and (or (= j 1) (= j (length vals)))
+		 (zerop x))
+     collect x))
 
+(defun local-peak? (a b c)
+  ;; TODO: check true local peak, checking context dynamically
+  (not (= (signum (- b a)) (signum (- c b)))))
+
+(defun average-intervals-of-arcs (vals)
+  (loop
+     with prev-val = (car vals)
+     for (a b c) on vals
+     while (and a b c)
+     when (and (local-peak? a b c)
+	       (not (zerop (- b prev-val))))
+     collect (prog1
+		 (- b prev-val)
+	       (setf prev-val b))
+     into peak-to-peak-intervals
+     finally (let* ((last-interval (- (car (last vals)) prev-val))
+		    (loi (strip-fringe-zeroes
+			  (nconc peak-to-peak-intervals
+				 (list last-interval)))))
+	       (return
+		 (float (/ (apply #'+ loi) (length loi)))))))
+
+
+(defmethod average-interval-spanned-by-melodic-arcs ((self om::chord-seq))
+  "M-24 Average Interval Spanned by Melodic Arcs: Average melodic interval (in
+semitones) separating the top note of melodic peaks and the bottom note of
+adjacent melodic troughs.  Returns value in mc"
+  (let ((pitches (om::flat (om::lmidic self))))
+    (average-intervals-of-arcs pitches)))
+
+;;; M-25 Melodic Pitch Variety: Average number of notes that go by before a
+;;; note's pitch is repeated (including the repeated note itself).  Notes that
+;;; do not recur after 16 notes are not included in this calculation. Set to 0
+;;; if there are no qualifying repeated notes in the piece.
+
+(defun how-many-until-repeated (val vals &optional (max 16) &key (test 'eql))
+  (or (loop
+	 for this in vals
+	 for i from 0 below max
+	 when (funcall test val this)
+	 do (progn 
+	      ;; include count for repeated val
+	      (return (1+ i))
+	      (loop-finish)))
+      0))
+
+(defun average-n-before-repetion (seq)
+  (loop
+     for val in seq
+     for tail on (cdr seq)
+     for N from 1
+     sum (how-many-until-repeated val tail) into total
+     ;; return average
+     finally (return (float (/ total N)))))
+
+(defmethod melodic-pitch-variety ((self om::chord-seq))
+  "M-25 Melodic Pitch Variety: Average number of notes that go by before a
+note's pitch is repeated (including the repeated note itself).  Notes that
+do not recur after 16 notes are not included in this calculation. Set to 0
+if there are no qualifying repeated notes in the piece."
+  (let ((pitches (om::flat (om::lmidic self))))
+    (average-n-before-repetion pitches)))
 
 ;;;
 ;;;
