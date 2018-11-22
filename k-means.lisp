@@ -147,7 +147,7 @@
 (loop for o in observations
      collect (euclid o))
 
-(k-means observations 3)
+(k-means observations 5)
 
 ;; (setq aaa (km (loop repeat 10 collect (list (random 1.0) (random 1.0))) 3))
 

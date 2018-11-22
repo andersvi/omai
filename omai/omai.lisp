@@ -28,6 +28,7 @@
 (compile&load (merge-pathnames "sources/features" *load-pathname*))
 (compile&load (merge-pathnames "sources/vector-space" *load-pathname*))
 (compile&load (merge-pathnames "sources/words" *load-pathname*))
+(compile&load (merge-pathnames "sources/k-means" *load-pathname*))
 
 (om::fill-library 
  '((nil nil (omai::vector-space) (omai::vector-features omai::get-class omai::get-similarity omai::make-word-vectors) nil)))

@@ -62,6 +62,20 @@
      nil) 
     ))
 
+(defun make-feature-vectors (matrix features &optional names)
+  (let ((vectors (make-hash-table :test 'equal)))
+       (loop for element in matrix
+             for n = 0 then (+ n 1)
+             ;; create a feature vector for each thing
+             do (let ((vector (make-hash-table :test 'equal))
+                      (element-name (or (nth n names) (format nil "e-~d" n))))
+                  (loop for feature in features
+                        for value in element do
+                        (setf (gethash feature vector) value))
+                  (setf (gethash element-name vectors) vector)))
+       vectors))
+
+
 ;;;=================
 ;;; ACCESSORS
 ;;;=================
@@ -240,8 +254,8 @@
         for centroid = (length-normalize-vector (apply #'vector-average class-vectors))
         ;;; for each class label, store the centroid in the 
         ;;; property list we created in `read-classes':
-        do (list label class-vectors)
-        do (setf (vs-class-centroid (gethash label classes)) centroid))
+        do (when (gethash label classes)
+             (setf (vs-class-centroid (gethash label classes)) centroid)))
   
   classes)
 

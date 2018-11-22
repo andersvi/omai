@@ -1,0 +1,203 @@
+
+(:patch
+ (:om-version 0.0106999995)
+ (:name "k-means")
+ (:doc "")
+ (:info
+  (:created "2018/11/22 17:38:35")
+  (:modified "2018/11/22 18:02:20"))
+ (:window (:size (754 634)) (:position (728 175)))
+ (:grid nil)
+ (:lock nil)
+ (:boxes
+  (:box
+   (:library "omai")
+   (:reference (:symbol "VECTOR-SPACE" "OMAI"))
+   (:type :object)
+   (:group-id nil)
+   (:name nil)
+   (:x 78)
+   (:y 185)
+   (:w 185)
+   (:h 68)
+   (:color nil)
+   (:border nil)
+   (:roundness nil)
+   (:text-font (:font (:face "Calibri") (:size 12) (:style :italic)))
+   (:name nil)
+   (:display :text)
+   (:showname nil)
+   (:group-id nil)
+   (:lock nil)
+   (:lambda nil)
+   (:inputs
+    (:input
+     (:type :standard)
+     (:name "SELF")
+     (:value nil)
+     (:reactive nil))
+    (:input
+     (:type :standard)
+     (:name "VECTORS")
+     (:value nil)
+     (:reactive nil))
+    (:input
+     (:type :standard)
+     (:name "CLASSES")
+     (:value nil)
+     (:reactive nil)))
+   (:outputs
+    (:output (:name "SELF") (:reactive nil))
+    (:output (:name "VECTORS") (:reactive nil))
+    (:output (:name "CLASSES") (:reactive nil)))
+   (:window (:size (nil nil)) (:position (nil nil)))
+   (:edition-params)
+   (:value
+    (:object
+     (:class (:symbol "VECTOR-SPACE" "OMAI"))
+     (:slots
+      ((:vectors
+        (:hash-table
+         (:keys
+          (:list
+           "e-1"
+           "e-6"
+           "e-2"
+           "e-7"
+           "e-3"
+           "e-8"
+           "e-4"
+           "e-0"
+           "e-5"))
+         (:vals
+          (:list
+           (:hash-table
+            (:keys (:list "feat-A" "feat-B"))
+            (:vals (:list 0.5 1.0))
+            (:test equal))
+           (:hash-table
+            (:keys (:list "feat-A" "feat-B"))
+            (:vals (:list 7.0 5.5))
+            (:test equal))
+           (:hash-table
+            (:keys (:list "feat-A" "feat-B"))
+            (:vals (:list 0.8 0.5))
+            (:test equal))
+           (:hash-table
+            (:keys (:list "feat-A" "feat-B"))
+            (:vals (:list 4.0 9.0))
+            (:test equal))
+           (:hash-table
+            (:keys (:list "feat-A" "feat-B"))
+            (:vals (:list 1.0 8.0))
+            (:test equal))
+           (:hash-table
+            (:keys (:list "feat-A" "feat-B"))
+            (:vals (:list 9.0 4.0))
+            (:test equal))
+           (:hash-table
+            (:keys (:list "feat-A" "feat-B"))
+            (:vals (:list 0.9 1.2))
+            (:test equal))
+           (:hash-table
+            (:keys (:list "feat-A" "feat-B"))
+            (:vals (:list 3.0 7.0))
+            (:test equal))
+           (:hash-table
+            (:keys (:list "feat-A" "feat-B"))
+            (:vals (:list 6.0 4.0))
+            (:test equal))))
+         (:test equal)))
+       (:classes
+        (:hash-table (:keys nil) (:vals nil) (:test equal)))))))
+   (:id 0))
+  (:box
+   (:reference (:symbol "MAKE-FEATURE-VECTORS" "OMAI"))
+   (:type :function)
+   (:group-id nil)
+   (:name "make-feature-vectors")
+   (:x 65)
+   (:y 124)
+   (:w 220)
+   (:h 30)
+   (:color nil)
+   (:border nil)
+   (:roundness nil)
+   (:text-font nil)
+   (:align nil)
+   (:lock nil)
+   (:lambda nil)
+   (:inputs
+    (:input
+     (:type :standard)
+     (:name "MATRIX")
+     (:value nil)
+     (:reactive nil))
+    (:input
+     (:type :standard)
+     (:name "FEATURES")
+     (:value nil)
+     (:reactive nil)))
+   (:outputs (:output (:name "out") (:reactive nil)))
+   (:id 1))
+  (:box
+   (:reference cons)
+   (:type :value)
+   (:group-id nil)
+   (:name "value box")
+   (:x 9)
+   (:y 43)
+   (:w 149)
+   (:h 62)
+   (:color nil)
+   (:border nil)
+   (:roundness nil)
+   (:text-font nil)
+   (:align nil)
+   (:lock nil)
+   (:inputs)
+   (:outputs (:output (:name "value") (:reactive nil)))
+   (:value
+    (:list
+     (:list 3.0 7.0)
+     (:list 0.5 1.0)
+     (:list 0.8 0.5)
+     (:list 1.0 8.0)
+     (:list 0.9 1.2)
+     (:list 6.0 4.0)
+     (:list 7.0 5.5)
+     (:list 4.0 9.0)
+     (:list 9.0 4.0)))
+   (:id 2))
+  (:box
+   (:reference cons)
+   (:type :value)
+   (:group-id nil)
+   (:name "value box")
+   (:x 174)
+   (:y 73)
+   (:w 107)
+   (:h 30)
+   (:color nil)
+   (:border nil)
+   (:roundness nil)
+   (:text-font nil)
+   (:align nil)
+   (:lock nil)
+   (:inputs)
+   (:outputs (:output (:name "value") (:reactive nil)))
+   (:value (:list "feat-A" "feat-B"))
+   (:id 3)))
+ (:connections
+  (:connection
+   (:from (:box 1 :out 0))
+   (:to (:box 0 :in 1))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 2 :out 0))
+   (:to (:box 1 :in 0))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 3 :out 0))
+   (:to (:box 1 :in 1))
+   (:attributes (:color nil :style nil :modif nil)))))
