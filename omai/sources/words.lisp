@@ -185,7 +185,7 @@
 
 ;;; CLASSIFICATION
 
-(defparameter  (read-classes-from-file classes-file))
+(defparameter *classes* (read-classes-from-file classes-file))
 (compute-class-centroids *classes* *vectors*)
 
 
@@ -194,7 +194,8 @@
 (with-open-file (stream test-file :direction :input)
   (loop for word = (read stream nil nil)
         while word
-        collect (classify (get-feature-vector *vectors* (normalize-token word)) *classes* #'dot-product)))
+        collect (list (normalize-token word) 
+                      (classify (get-feature-vector *vectors* (normalize-token word)) *classes* #'dot-product))))
 
 ;; ==>
 ;;

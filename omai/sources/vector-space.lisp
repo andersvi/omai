@@ -69,8 +69,7 @@
 (defun get-feature-vector (vectors thing)
   "Retrieves the feature vector for a given object."
   (declare (type hash-table vectors))
-  (print (list vectors thing))
-  (print (gethash (normalize-token thing) vectors)))
+  (gethash thing vectors))
 
 (defun vector-count (vectors)
   "The number of elements in the vector space."
@@ -211,6 +210,8 @@
 ;;; COMPUTE CENTROIDS...
 ;;;---------------------
 
+;;; check this. maybe issues with tests etc.
+
 (defun sum-vectors (&rest vectors)
   (let ((sum (make-hash-table :test #'equal)))
     (dolist (vec vectors)
@@ -239,7 +240,7 @@
         for centroid = (length-normalize-vector (apply #'vector-average class-vectors))
         ;;; for each class label, store the centroid in the 
         ;;; property list we created in `read-classes':
-        do (print (list label class-vectors))
+        do (list label class-vectors)
         do (setf (vs-class-centroid (gethash label classes)) centroid))
   
   classes)
@@ -252,8 +253,8 @@
 (defun classify (vector classes sim-fn)
   "Classifies vector according to centroid distance to classes."
   
-  (let ((named-centroids (print (loop for label being the hash-keys of classes 
-                               collect (cons label (get-class-centroid label classes))))))
+  (let ((named-centroids (loop for label being the hash-keys of classes 
+                               collect (cons label (get-class-centroid label classes)))))
     (loop with max-label with max-sim = 0
           for (label . center) in named-centroids
           for sim = (funcall sim-fn vector center)
