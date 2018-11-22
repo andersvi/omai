@@ -684,6 +684,34 @@ intervals are found."
 ;;; this feature as for the Melodic Interval Histogram. Set to 0 if no melodic arcs
 ;;; are found.
 
+(defun direction-count (dirs dir-counts previous-dir N-current-dir)
+  ;; dirs is a list of steps, ie: melodic directions
+  (if (null dirs)
+      (nreverse (cons (1+ N-current-dir) dir-counts))
+      (let* ((current-dir (car dirs))
+	     (peak? (minusp (* current-dir previous-dir)))) ;change in direction
+	(direction-count (cdr dirs)
+			 (if peak? (cons (1+ N-current-dir) dir-counts) dir-counts)
+			 ;; if 0, continue counting until change of dir
+			 (if (zerop current-dir) previous-dir current-dir)
+			 (if peak? 0 (1+ N-current-dir))))))
+
+;; (let ((aaa '(1 1 1 0 -1 -1 0 0 -1 1 -1 -1 -1)))
+;;   (direction-count (cdr aaa) '() (car aaa) 0))
+
+(defun average-arc-length (dirs)
+  (let ((counts (direction-count (cdr dirs) '() (car dirs) 0)))
+    (float (/ (apply #'+ counts)
+	      (length counts)))))
+
+(defmethod average-length-of-melodic-arcs ((self om::chord-seq))
+  "M-23 Average Length of Melodic Arcs: Average number of notes that separate
+melodic peaks and troughs. Similar assumptions are made in the calculation of
+this feature as for the Melodic Interval Histogram. Set to 0 if no melodic arcs
+are found."
+  (let ((intervals (om::x->dx (mc->semitones (om::lmidic self)))))
+    (average-arc-length intervals)))
+
 ;;; M-24 Average Interval Spanned by Melodic Arcs: Average melodic interval (in
 ;;; semitones) separating the top note of melodic peaks and the bottom note of
 ;;; adjacent melodic troughs. Similar assumptions are made in the calculation of
