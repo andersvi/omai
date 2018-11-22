@@ -26,10 +26,11 @@
 
 (compile&load (merge-pathnames "sources/package" *load-pathname*))
 (compile&load (merge-pathnames "sources/features" *load-pathname*))
-(compile&load (merge-pathnames "sources/rocchio" *load-pathname*))
+(compile&load (merge-pathnames "sources/vector-space" *load-pathname*))
+(compile&load (merge-pathnames "sources/words" *load-pathname*))
 
 (om::fill-library 
- '((nil nil (omai::vector-space) (omai::word-features omai::get-word-class omai::get-similarty) nil)))
+ '((nil nil (omai::vector-space) (omai::vector-features omai::get-class omai::get-similarity omai::make-word-vectors) nil)))
 
 (om::om-print "==============================" )
 (om::om-print "OMAI - AI Tools for OM" )

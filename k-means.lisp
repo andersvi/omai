@@ -20,17 +20,19 @@
 ;; (vsum V3 (list 10 0 42))
 ;;   (11 2 45)
 
+
+
+
 (defparameter observations
   '((3.0 7.0) (0.5 1.0) (0.8 0.5)
     (1.0 8.0) (0.9 1.2) (6.0 4.0)
     (7.0 5.5) (4.0 9.0) (9.0 4.0)))
 
-
+;;; euclidian distance
 (defun euclid (fvec)
   (sqrt
-   (loop
-      for value in fvec
-      sum (expt value 2))))
+   (loop for value in fvec
+         sum (expt value 2))))
 
 (defun vsum (vector1 vector2)
   (mapcar #'+ vector1 vector2))
@@ -38,19 +40,19 @@
 (defun vsub (vector1 vector2)
   (mapcar #'- vector1 vector2))
 
+;; centroid of set
 (defun centroid (observations)
-  ;; centroid of set
   (if (null observations)
       nil
       (mapcar #'(lambda (coord) (/ coord (length observations)))
 	      (reduce #'vsum observations))))
 
+;; dot product
 (defun innerprod (vector1 vector2)
-  ;; dot product
   (reduce #'+ (mapcar #'* vector1 vector2)))
 
+;; euclidian norm
 (defun norm (vector)
-  ;; euclidian norm
   (sqrt (innerprod vector vector)))
 
 (defun initialize (observations k)
