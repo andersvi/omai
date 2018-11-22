@@ -710,7 +710,9 @@ melodic peaks and troughs. Similar assumptions are made in the calculation of
 this feature as for the Melodic Interval Histogram. Set to 0 if no melodic arcs
 are found."
   (let ((intervals (om::x->dx (mc->semitones (om::lmidic self)))))
-    (average-arc-length intervals)))
+    (if (zerop (apply #'+ intervals))
+	0
+	(average-arc-length intervals))))
 
 ;;; M-24 Average Interval Spanned by Melodic Arcs: Average melodic interval (in
 ;;; semitones) separating the top note of melodic peaks and the bottom note of
