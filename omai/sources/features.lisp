@@ -660,11 +660,24 @@ central note. Set to 0 if there are no notes in the piece."
        collect (list a b c) into utliste
        finally (return (float (/ embellishments N))))))
 
-;; (melodic-embellishments (om::testcs2))
-
-
 ;;; M-22 Direction of Melodic Motion: Fraction of melodic intervals that are rising
 ;;; in pitch. Set to zero if no rising or falling melodic intervals are found.
+
+(defmethod direction-of-melodic-motion ((self om::chord-seq))
+  "M-22 Direction of Melodic Motion: Fraction of melodic intervals that are
+rising in pitch. Set to zero if no rising or falling melodic
+intervals are found."
+  (let* ((intervals (mapcar #'(lambda (x) (round x 100))
+			    (om::x->dx (om::flat (om::lmidic self)))))
+	 (N (length intervals)))
+    (loop
+       with melodic-motion? = 0
+       for (a b) on intervals
+       when (and a b)
+       ;; melodic motion = not directly repeating pitch
+       unless (= a b)		 
+       do (incf melodic-motion?)
+       finally (return (float (/ melodic-motion? N))))))
 
 ;;; M-23 Average Length of Melodic Arcs: Average number of notes that separate
 ;;; melodic peaks and troughs. Similar assumptions are made in the calculation of
