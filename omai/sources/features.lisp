@@ -754,14 +754,38 @@ adjacent melodic troughs.  Returns value in mc"
   (let ((pitches (om::flat (om::lmidic self))))
     (average-intervals-of-arcs pitches)))
 
-;;; M-25 Melodic Pitch Variety: Average number of notes that go by in a MIDI channel
-;;; before a note's pitch is repeated (including the repeated note itself). This is
-;;; calculated across each channel individually before being combined. Notes that
-;;; occur simultaneously on the same MIDI tick are only counted as one note for the
-;;; purpose of this calculation. Notes that do not recur after 16 notes in the same
-;;; channel are not included in this calculation. Set to 0 if there are no
-;;; qualifying repeated notes in the piece.
+;;; M-25 Melodic Pitch Variety: Average number of notes that go by before a
+;;; note's pitch is repeated (including the repeated note itself).  Notes that
+;;; do not recur after 16 notes are not included in this calculation. Set to 0
+;;; if there are no qualifying repeated notes in the piece.
 
+(defun how-many-until-repeated (val vals &optional (max 16) &key (test 'eql))
+  (or (loop
+	 for this in vals
+	 for i from 0 below max
+	 when (funcall test val this)
+	 do (progn 
+	      ;; include count for repeated val
+	      (return (1+ i))
+	      (loop-finish)))
+      0))
+
+(defun average-n-before-repetion (seq)
+  (loop
+     for val in seq
+     for tail on (cdr seq)
+     for N from 1
+     sum (how-many-until-repeated val tail) into total
+     ;; return average
+     finally (return (float (/ total N)))))
+
+(defmethod melodic-pitch-variety ((self om::chord-seq))
+  "M-25 Melodic Pitch Variety: Average number of notes that go by before a
+note's pitch is repeated (including the repeated note itself).  Notes that
+do not recur after 16 notes are not included in this calculation. Set to 0
+if there are no qualifying repeated notes in the piece."
+  (let ((pitches (om::flat (om::lmidic self))))
+    (average-n-before-repetion pitches)))
 
 ;;;
 ;;;
