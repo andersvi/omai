@@ -171,54 +171,29 @@
 ;; store a property list with two keys, :members and :centroid.
 ;; implements Rocchio algorithm for classification
 
-(defstruct vs-class (members) (centroid))
+(defstruct vs-class (label) (members) (centroid))
 
-
-(defun initialize-classes (classes)
-  
-  (declare (type (or list pathname hash-table) classes))
-
-  (typecase classes
-    ;;; already good!
-    (hash-table classes)
-    ;;; convert the list in hash-table
-    (list (read-classes-from-list classes))
-    ;; read file and return hash-table
-    (pathname (read-classes-from-file classes))
-    ;;; problem
-    (otherwise 
-     (format t "~&ERROR: the classes be initialized with a list or a hash-table~%")
-     nil) 
-
-    ))
 
 (defmethod read-classes-from-list ((classes list))
-  (let ((class-table (make-hash-table :test 'equal)))
-    (loop for list in classes
-          for class = (first list)
-          for members = (second list)
-          do (setf (gethash class class-table) (make-vs-class :members members)))
-  class-table))
+  (loop for list in classes
+        for class = (first list)
+        for members = (second list)
+        collect (make-vs-class :label class :members members)))
 
+;;; not used
 (defmethod read-classes-from-file ((file pathname))
-   (let ((class-table (make-hash-table :test 'equal)))
-     (with-open-file (stream file)
-       (loop for list = (read stream nil nil)
-             for class = (first list)
-             for members = (second list)
-             while list
-             do (setf (gethash class class-table) (make-vs-class :members members))))
-     class-table))
+   (with-open-file (stream file)
+     (loop for list = (read stream nil nil)
+           for class = (first list)
+           for members = (second list)
+           while list
+           collect (make-vs-class :label class :members members))))
+
+(defun initialize-classes (classes)
+  (declare (type list classes))
+  (read-classes-from-list classes))
 
 
-(defun get-class-centroid (name classes)
-  (let ((class (gethash name classes)))
-    (and class (vs-class-centroid class))))
-
-(defun get-class-members (name classes)
-  (let ((class (gethash name classes)))
-    (and class (vs-class-members class))))
-     
 
 ;;;---------------------
 ;;; COMPUTE CENTROIDS...
@@ -246,16 +221,15 @@
 (defun compute-class-centroids (classes vectors)
   "Compute and store the average-vectors for each class."
   
-  (declare (type hash-table classes vectors))
+  (declare (type hash-table vectors)
+           (type list classes))
   
-  (loop for label being the hash-keys of classes
-        for members = (get-class-members label classes)
-        for class-vectors = (remove nil (mapcar #'(lambda (w) (get-feature-vector vectors w)) members))
-        for centroid = (length-normalize-vector (apply #'vector-average class-vectors))
-        ;;; for each class label, store the centroid in the 
-        ;;; property list we created in `read-classes':
-        do (when (gethash label classes)
-             (setf (vs-class-centroid (gethash label classes)) centroid)))
+  (loop for class in classes 
+        do (let* ((class-vectors (remove nil (mapcar 
+                                              #'(lambda (w) (get-feature-vector vectors w)) 
+                                              (vs-class-members class))))
+                  (centroid (length-normalize-vector (apply #'vector-average class-vectors))))
+             (setf (vs-class-centroid class) centroid)))
   
   classes)
 
@@ -267,8 +241,11 @@
 (defun classify (vector classes sim-fn)
   "Classifies vector according to centroid distance to classes."
   
-  (let ((named-centroids (loop for label being the hash-keys of classes 
-                               collect (cons label (get-class-centroid label classes)))))
+  (declare (type hash-table vector)
+           (type list class))
+ 
+  (let ((named-centroids (loop for class in classes 
+                               collect (cons (vs-class-label class) (vs-class-centroid class)))))
     (loop with max-label with max-sim = 0
           for (label . center) in named-centroids
           for sim = (funcall sim-fn vector center)
