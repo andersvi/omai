@@ -265,6 +265,7 @@ the purpose of this calculation."
   (sort (count-individuals data) #'> :key #'cdr))
 
 (defmethod most-common-pitch ((self om::chord-seq))
+  "P-14 Most Common Pitch: MC pitch value of the most frequently occurring pitch."
   (caar (most-common-item (om::flat (om::lmidic self)))))
 
 ;;; P-15 Mean Pitch: Mean midicent value
@@ -331,6 +332,9 @@ makes up more than 'threshold' percent (factor) of data"
        count (funcall #'dominant-and-more-than-9% a b))))
 
 (defmethod dominant-spread ((self om::chord-seq))
+  "Dominant Spread: Largest number of consecutive pitch classes separated by
+perfect 5ths that each individually account for at least 9% of the total notes
+in the piece."
   (let ((pcs (mapcar #'pitch->pc (om::flat (om::lmidic self)))))
     (count-consecutive-fifths pcs 0.09)))
 
