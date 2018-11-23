@@ -21,85 +21,128 @@
 
 (in-package :omai)
 
+(defun vector-values (vector)
+  (loop for v being the hash-value of vector collect v))
+                   
+(defun lsum (l1 l2)
+  (declare (type list l1 l2))
+  (if (null l1) l2
+    (mapcar #'+ l1 l2)))
 
-;;; euclidian distance
-(defun euclid (fvec)
-  (sqrt
-   (loop for value in fvec
-         sum (expt value 2))))
-
-(defun vsum (vector1 vector2)
-  (mapcar #'+ vector1 vector2))
-
-(defun vsub (vector1 vector2)
-  (mapcar #'- vector1 vector2))
-
-;; centroid of set
-(defun centroid (observations)
-  (if (null observations)
-      nil
-      (mapcar #'(lambda (coord) (/ coord (length observations)))
-	      (reduce #'vsum observations))))
+(defun lsub (l1 l2)
+  (declare (type list l1 l2))
+  (if (null l1) l2
+    (mapcar #'- l1 l2)))
 
 ;; dot product
-(defun innerprod (vector1 vector2)
-  (reduce #'+ (mapcar #'* vector1 vector2)))
+(defun innerprod (l1 l2)
+  (declare (type list l1 l2))
+  (reduce #'+ (mapcar #'* l1 l2)))
 
 ;; euclidian norm
-(defun norm (vector)
-  (sqrt (innerprod vector vector)))
+(defun norm (l)
+  (declare (type list l))
+  (sqrt (innerprod l l)))
 
 
-(defun map-cluster (clusters-map observations cl index)
-  (cond ((null clusters-map) nil)
-        ((not (= cl (car clusters-map)))
-         (map-cluster (cdr clusters-map) observations cl (+ index 1)))
-        (t (cons (nth index observations)
-                 (map-cluster (cdr clusters-map) observations cl (+ index 1))))))
+;; centroid of a set: a list or normlized sums (for each feature)
+(defun centroid (vectors)
+  (declare (type hash-table vectors))
+  (let ((size (hash-table-count vectors)))
+    (if (zerop size) nil
+      (let ((sums nil))
+        (loop for vector being the hash-value of vectors 
+              do (setf sums (lsum sums (vector-values vector))))
+        (mapcar #'(lambda (coord) (/ coord size)) sums)))
+    ))
+              
 
-(defun map-clusters (clusters-map observations cl k)
-  (if (= cl k)
-      nil
-      (cons (map-cluster clusters-map observations cl 0)
-	    (map-clusters clusters-map observations (+ cl 1) k))))
-
-(defun re-centroids (clusters-map observations k)
-  (mapcar #'centroid (map-clusters clusters-map observations 0 k)))
-
-(defun pick-centroid (v cs old-distance result)
-  ;; Returns the centroid whose distance between v and itself is the lowest calculated.
-  (cond ((null cs) result)
-        ((null (car cs)) (pick-centroid v (cdr cs) old-distance result))
-        (t (let* ((c (car cs))
-		  (new-distance (norm (vsub v c))))
-             (cond ((< new-distance old-distance)
-                    (pick-centroid v (cdr cs) new-distance c))
-                   (t (pick-centroid v (cdr cs) old-distance result)))))))
-
-
-(defun k-partition (observations cs)
-  (loop
-     for obs in observations
-     collect (position
-	      (pick-centroid obs cs most-positive-fixnum cs)
-	      cs)))
+; Returns the centroid with lower distance to vector 
+(defun get-closer-centroid (vector centroids max-distance result)
+  (declare (type hash-table vector)
+           (type list centroids)
+           (type number max-distance))
+  
+  (cond 
+   ((null centroids) result)
+   ((null (car centroids)) (get-closer-centroid vector (cdr centroids) max-distance result))
+        
+   (t (let* ((c (car centroids))
+             (new-distance (norm (lsub (vector-values vector) c))))
+        (if (< new-distance max-distance)
+            (get-closer-centroid vector (cdr centroids) new-distance c)
+         (get-closer-centroid vector (cdr centroids) max-distance result))
+        ))
+   ))
 
 
-(defun lloyd-km (observations clusters cs k)
-  (let ((new-clusters (k-partition observations cs)))
-    (if (equal clusters new-clusters)
-	clusters
-	(lloyd-km observations
-		  new-clusters
-		  (re-centroids new-clusters observations k)
-		  k))))
+; a clusters-map is a list of indices corresponding to the class of each vector
+; => returns for each vector the position of it's centroid in the centroid list 
+(defun get-cluster-map (vectors centroids)
+
+   (declare (type hash-table vectors)
+            (type list centroids))
+           
+   (loop for vector being the hash-value of vectors 
+         for name being the hash-key of vectors 
+         collect (cons 
+                  name
+                  (position
+                   (get-closer-centroid vector centroids most-positive-fixnum nil)
+                   centroids
+                   ;;; test is eql: ok ?
+                   )))
+   )
 
 
-(defun initialize (observations k)
-  (if (= k 0)
-      nil
-      (let ((rand (nth (random (length observations)) observations)))
-	(cons rand (initialize (remove rand observations) (- k 1))))))
+(defun lloyd-km (vectors clusters centroids k)
+  
+  (declare (type hash-table vectors)
+           (type list clusters centroids)
+           (type integer k))
+
+  (let ((cluster-map (get-cluster-map vectors centroids)))
+    
+    (if (equal clusters cluster-map)
+	
+        clusters
+      
+      (lloyd-km vectors cluster-map
+                (mapcar #'centroid (make-clusters cluster-map vectors k))
+                k))))
+
+
+;;================================
+; returns a list of cluser: each cluster is a hash-table of vectors
+(defun make-clusters (clusters-map vectors k)
+  (let ((clusters (make-list k)))
+    (loop for elt in clusters-map do
+          (unless (nth (cdr elt) clusters)
+            (setf (nth (cdr elt) clusters) (make-hash-table :test 'equal)))
+          (setf (gethash (car elt) (nth (cdr elt) clusters))
+                (gethash (car elt) vectors))
+          )
+    clusters))
+
+
+;;================================
+;;; get a list of n random vectors 
+(defun rec-collect-random-vectors (keys vectors k)
+  (declare (type list keys)
+           (type hash-table vectors)
+           (type integer k))
+  
+  (if (= k 0) nil
+    (let ((rand-key (nth (random (length keys)) keys)))
+      (cons (gethash rand-key vectors)
+            (rec-collect-random-vectors (remove rand-key keys) vectors (1- k))))))
+
+
+(defun initialize-centroids (vectors k)
+  (declare (type hash-table vectors)
+           (type integer k)) 
+  (let ((all-keys (loop for k being the hash-keys of vectors collect k)))
+    (mapcar #'vector-values (rec-collect-random-vectors all-keys vectors k))))
 
 
 ;;;========================
@@ -118,22 +161,46 @@
   (if (< (hash-table-count vectors) k) 
  
       (progn (format t "k >= observations !!") nil)
-  
-    (let ((classes (make-hash-table :test 'equal)))
     
-      (if (= (hash-table-count vectors) k) 
-
-          ;;; just make one class with each observation vector
-          (loop for element being the hash-keys of vectors
-                for n from 0
-                do (setf (gethash (format "class-~D" n) classes)
-                         (make-vs-class :members (list element))))
+    (if (= (hash-table-count vectors) k) 
         
-        ;;; main call here:
-        (let ((clusters (lloyd-km vectors nil (initialize observations k) k)))
-          (map-clusters clusters vectors 0 k)))
-      classes)
-    ))
+        ;;; just make one class with each observation vector
+        (loop for element being the hash-keys of vectors
+              for n from 0
+              collect (make-vs-class :label (format nil "class-~D" n) :members (list element)))
+        
+      ;;; main call here:
+      (let* ((init-state (initialize-centroids vectors k))
+             (cluster-map (lloyd-km vectors nil init-state k))
+             (clusters (make-clusters cluster-map vectors k)))
+        ;;;(map-clusters cluster-map vectors 0 k)
+        
+        (loop for cluster in clusters 
+              for n from 0 
+              collect (make-vs-class 
+                       :label (format nil "class-~D" n) 
+                       :members (loop for key being the hash-keys of cluster collect key))))
+      )
+    )
+  )
     
+
+
+#|
+
+(defun map-cluster (clusters-map observations cl index)
+  (cond ((null clusters-map) nil)
+        ((not (= cl (car clusters-map)))
+         (map-cluster (cdr clusters-map) observations cl (+ index 1)))
+        (t (cons (nth index observations)
+                 (map-cluster (cdr clusters-map) observations cl (+ index 1))))))
+
+(defun map-clusters (clusters-map observations cl k)
+  (if (= cl k)
+      nil
+      (cons (map-cluster clusters-map observations cl 0)
+	    (map-clusters clusters-map observations (+ cl 1) k))))
+
+|#
 
 

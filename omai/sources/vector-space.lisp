@@ -262,7 +262,8 @@
 
 (om::defclass! vector-space ()
   ((vectors :initform nil :initarg :vectors :accessor vectors :documentation "hash-table containing vectors")
-   (classes :initform nil :initarg :classes :accessor classes :documentation "hash-table containing classes")
+   (classes :initform nil :initarg :classes :accessor classes 
+            :documentation "hash-table containing classes number of clustering")
    (similarity-fn :initform #'dot-product :accessor similarity-fn))
   (:icon :omai))
       
@@ -271,7 +272,18 @@
   
   (setf (vectors self) (initialize-vector-space (vectors self)))
   
-  (setf (classes self) (initialize-classes (classes self)))
+  (setf (classes self) 
+        (typecase (classes self)
+          
+          ;;; list: classes are alreayd provided (just reformat)
+          (cons 
+           (initialize-classes (classes self)))
+        
+          ;;; integer: create classes by clustering (k-means)
+          (integer 
+           (k-means (vectors self) (classes self)))
+          
+          (otherwise nil)))
   
   (when (classes self)
     (compute-class-centroids (classes self) (vectors self)))
