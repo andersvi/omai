@@ -65,22 +65,23 @@
    )
 
 
-(defun lloyd-km (vectors clusters centroids k)
+(defun lloyd-km (vectors cluster-map centroids k)
   
   (declare (type hash-table vectors)
            (type list clusters centroids)
            (type integer k))
 
-  (let ((cluster-map (get-cluster-map vectors centroids)))
+  (let ((new-cluster-map (get-cluster-map vectors centroids)))
     
-    (if (equal clusters cluster-map)
-	
-        clusters
+    (if (equal cluster-map new-cluster-map)
+  
+        cluster-map
       
-      (lloyd-km vectors cluster-map
-                (loop for cluster-vectors in (make-clusters cluster-map vectors k)
+      (lloyd-km vectors new-cluster-map
+                (loop for cluster-vectors in (make-clusters new-cluster-map vectors k)
                       collect (compute-centroids cluster-vectors))
                 k))))
+
 
 
 ;;================================
@@ -107,7 +108,6 @@
     (let ((rand-key (nth (random (length keys)) keys)))
       (cons (vs-vector-features (gethash rand-key vectors))
             (rec-collect-random-vectors (remove rand-key keys) vectors (1- k))))))
-
 
 (defun initialize-centroids (vectors k)
   (declare (type hash-table vectors)
