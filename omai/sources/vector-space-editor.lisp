@@ -54,7 +54,7 @@
     (oa:om-invalidate-view (om::main-view editor))))
 
 (defclass vs-2D-view (om::omeditorview) ())
-(defclass vs-3D-view (oa::om-view) ())
+(defclass vs-3D-view (om::om-opengl-view) ())
 
 
 (defmethod om::make-editor-window-contents ((editor vs-editor))
@@ -63,7 +63,9 @@
          (main-view 
           (case (om::editor-get-edit-param editor :view-mode)
            (:2d (oa::om-make-view 'vs-2D-view :editor editor :bg-color (oa:om-def-color :white)))
-           (:3d (oa::om-make-view 'vs-3D-view :bg-color (om::om-random-color)))))
+           (:3d (oa::om-make-view 'vs-3D-view 
+                                  :bg-color (oa:om-def-color :white)
+                                  ))))
          
          (x-menu (oa::om-make-di 'oa::om-popup-list :items (features vs) 
                                  :value (om::editor-get-edit-param editor :dimension1)
@@ -106,6 +108,9 @@
                                                                      (om::editor-set-edit-param editor :view-mode (om::om-get-selected-item b))
                                                                      (om::build-editor-window editor)
                                                                      ;;; (om::init-editor-window editor) ; no need to recache everything (?)
+                                                                     (when (equal (om::editor-get-edit-param editor :view-mode) :3D)
+                                                                       (om::om-init-3D-view (om::main-view editor))
+                                                                       (om::om-set-gl-objects (om::main-view editor) (create-GL-objects editor)))
                                                                      ))
                                       :separator
                                       nil
@@ -207,6 +212,9 @@
     (setf (cached-points editor)
           (make-array (hash-table-count (vectors vs)) :element-type 'cached-point))
     (cache-vs-points editor)
+
+    (when (equal (om::editor-get-edit-param editor :view-mode) :3D)
+      (om::om-init-3D-view (om::main-view editor)))
     
     editor))
 
@@ -284,6 +292,10 @@
                 (null (cadr (nth i (cached-ranges editor))))
                 (= (car (nth i (cached-ranges editor))) (cadr (nth i (cached-ranges editor)))))
         (setf (nth i (cached-ranges editor)) (list -1 1))))
+    
+    (when (equal (om::editor-get-edit-param editor :view-mode) :3D)
+      (om::om-set-gl-objects (om::main-view editor) (create-GL-objects editor)))
+
     ))
 
     
@@ -322,8 +334,97 @@
       )))
 
 
+
+
+;;;=======================================
+;;; 3D DRAWING
+;;;=======================================
+
 (defmethod oa::om-draw-contents ((self vs-3D-view))
-  (let ((r (/ (min (oa:om-height self) (oa:om-width self)) 3))
+  (call-next-method)
+  (draw-axes self))
+
+
+(defmethod draw-axes ((self vs-3D-view))
+  (opengl:gl-push-matrix)
+  (let* ((l 1.0))
+    ;X axis
+    (opengl:gl-color3-f 0.8 0.3 0.3)
+    ;axis
+    (opengl:gl-begin opengl:*GL-LINES*)
+    (opengl:gl-vertex3-f -0.0 0.0 0.0) 
+    (opengl:gl-vertex3-f l 0.0 0.0)
+    (opengl:gl-end)
+    
+    ;Y axis
+    (opengl:gl-color3-f 0.3 0.6 0.3)
+    ;axis
+    (opengl:gl-begin opengl:*GL-LINES*)
+    (opengl:gl-vertex3-f 0.0 -0.0 0.0) 
+    (opengl:gl-vertex3-f 0.0 l 0.0) 
+    (opengl:gl-end)
+   
+
+    ;Z axis
+    (opengl:gl-color3-f 0.3 0.3 0.6)
+    ;axis
+    (opengl:gl-begin opengl:*GL-LINES*)
+    (opengl:gl-vertex3-f 0.0 0.0 -0.0)
+    (opengl:gl-vertex3-f 0.0 0.0 l)
+    (opengl:gl-end)
+    )
+  (om::restore-om-gl-colors-and-attributes)
+  (opengl:gl-pop-matrix))
+
+;need to call this sometimes ??
+;(gl-user::clear-gl-display-list (3Dp self))
+
+
+(defmethod create-GL-objects ((self vs-editor))
+  (let* ((r .01)
+         (x0 0) (y0 0) (z0 0)
+         ;(w (- (oa::om-width self) 20))
+         ;(h (- (oa::om-height self) 20))
+         (ranges (cached-ranges self))
+         (minx (car (nth 0 ranges)))
+         (maxx (cadr (nth 0 ranges)))
+         (miny (car (nth 1 ranges)))
+         (maxy (cadr (nth 1 ranges)))
+         (minz (car (nth 2 ranges)))
+         (maxz (cadr (nth 2 ranges)))
+         (rangex (- maxx minx))
+         (rangey (- maxy miny)) 
+         (rangez (- maxz minz)))
+    
+    (labels ((real-x-pos (x) (+ x0 (/ (- x minx) rangex)))
+             (real-y-pos (y) (+ y0 (/ (- y miny) rangey)))
+             (real-z-pos (z) (+ z0 (/ (- z minz) rangez))))
+      (loop for p being the array-elements of (cached-points self) 
+            for x = (real-x-pos (or (aref (cached-point-coordinates p) 0) -1))
+            for y = (real-y-pos (or (aref (cached-point-coordinates p) 1) -1))
+            for z = (real-z-pos (or (aref (cached-point-coordinates p) 2) -1))
+            for color = (when (cached-point-class p)
+                          (let ((pos (position (cached-point-class p)
+                                               (classes (om::object-value self))
+                                               :key 'vs-class-label)))
+                            (when pos (nth pos (class-colors self)))))
+            collect
+            (make-instance 'om::3d-sphere :center (list x y z) :size r 
+                           :color color)
+            
+            )
+      )))  
+
+(defmethod om::om-adapt-camera-to-object ((self vs-3D-view))
+  (setf (gl-user::center (gl-user::camera self)) 
+        (gl-user::make-xyz :x .5d0 :y .5d0 :z .5d0))
+  (call-next-method))
+
+
+
+#|
+
+(let ((r (/ (min (oa:om-height self) (oa:om-width self)) 3))
         (cx (/ (oa:om-width self) 2))
         (cy (/ (oa:om-height self) 2)))
     
@@ -340,6 +441,11 @@
     
     (oa:om-draw-arc (- cx (* r .5)) (+ cy (* r .2)) r r 0.5 (- pi 1))
 
-    )))
+    ))
+
+|#
+
+
+
 
 
