@@ -21,45 +21,15 @@
 
 (in-package :omai)
 
+
+;;; NOT ORDERED!
 (defun vector-values (vector)
   (loop for v being the hash-value of vector collect v))
                    
-(defun lsum (l1 l2)
-  (declare (type list l1 l2))
-  (if (null l1) l2
-    (mapcar #'+ l1 l2)))
-
-(defun lsub (l1 l2)
-  (declare (type list l1 l2))
-  (if (null l1) l2
-    (mapcar #'- l1 l2)))
-
-;; dot product
-(defun innerprod (l1 l2)
-  (declare (type list l1 l2))
-  (reduce #'+ (mapcar #'* l1 l2)))
-
-;; euclidian norm
-(defun norm (l)
-  (declare (type list l))
-  (sqrt (innerprod l l)))
-
-
-;; centroid of a set: a list or normlized sums (for each feature)
-(defun centroid (vectors)
-  (declare (type hash-table vectors))
-  (let ((size (hash-table-count vectors)))
-    (if (zerop size) nil
-      (let ((sums nil))
-        (loop for vector being the hash-value of vectors 
-              do (setf sums (lsum sums (vector-values vector))))
-        (mapcar #'(lambda (coord) (/ coord size)) sums)))
-    ))
-              
 
 ; Returns the centroid with lower distance to vector 
 (defun get-closer-centroid (vector centroids max-distance result)
-  (declare (type hash-table vector)
+  (declare (type vs-vector vector)
            (type list centroids)
            (type number max-distance))
   
@@ -68,7 +38,7 @@
    ((null (car centroids)) (get-closer-centroid vector (cdr centroids) max-distance result))
         
    (t (let* ((c (car centroids))
-             (new-distance (norm (lsub (vector-values vector) c))))
+             (new-distance (euclid-norm (vector-diff (vs-vector-features vector) c))))
         (if (< new-distance max-distance)
             (get-closer-centroid vector (cdr centroids) new-distance c)
          (get-closer-centroid vector (cdr centroids) max-distance result))
@@ -108,7 +78,8 @@
         clusters
       
       (lloyd-km vectors cluster-map
-                (mapcar #'centroid (make-clusters cluster-map vectors k))
+                (loop for cluster-vectors in (make-clusters cluster-map vectors k)
+                      collect (compute-centroids cluster-vectors))
                 k))))
 
 
@@ -134,7 +105,7 @@
   
   (if (= k 0) nil
     (let ((rand-key (nth (random (length keys)) keys)))
-      (cons (gethash rand-key vectors)
+      (cons (vs-vector-features (gethash rand-key vectors))
             (rec-collect-random-vectors (remove rand-key keys) vectors (1- k))))))
 
 
@@ -142,7 +113,8 @@
   (declare (type hash-table vectors)
            (type integer k)) 
   (let ((all-keys (loop for k being the hash-keys of vectors collect k)))
-    (mapcar #'vector-values (rec-collect-random-vectors all-keys vectors k))))
+    ; (mapcar #'vector-values (rec-collect-random-vectors all-keys vectors k))
+    (rec-collect-random-vectors all-keys vectors k)))
 
 
 ;;;========================

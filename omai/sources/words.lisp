@@ -112,7 +112,7 @@
         do (loop for feature in tokens
                  for j from 0
                  unless (= i j)  ;;; we don't count a token occurrence as a feature of itself:
-                 do (incf (gethash feature feat-vect 0)))
+                 do (incf (gethash feature (vs-vector-features feat-vect) 0)))
         ))
 
 ; Learns from corpus 
@@ -137,13 +137,14 @@
   
   (let ((vectors-ht (make-hash-table :test #'equal)))
     (loop for w in words do
-          (setf (gethash (normalize-token w) vectors-ht) (make-hash-table :test #'equal)))
-  
+          (setf (gethash (normalize-token w) vectors-ht) 
+                (make-vs-vector)))
+    
     (read-corpus vectors-ht corpus)
     
     (loop for w being the hash-keys of vectors-ht
           for vec being the hash-values of vectors-ht
-          do (length-normalize-vector vec))
+          do (normalize-vector (vs-vector-features vec)))
     
     vectors-ht))
 
@@ -153,8 +154,6 @@
 
 (defmethod vector-similarity ((self vector-space) (w1 string) (w2 string) test)
   (call-next-method self (normalize-token w1) (normalize-token w2) test))
-
-
 
 
 

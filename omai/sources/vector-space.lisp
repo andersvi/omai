@@ -27,69 +27,46 @@
 ;;;=================
 ;;; vectors are stored in a hash-table (fine for sparse vectors). 
 ;;; We also use a hash-table for storing each feature vector 
-;;; -> hash-table of hash-tables.
+
+(defstruct vs-vector (features (make-hash-table :test 'equal) :type hash-table))
+(defstruct vs-class (label) (members) (centroid))
 
 
-;;;=================
-;;; CONSRUCTION
-;;;=================
-
-(defun initialize-vector-space (things)
-  
-  (declare (type (or list hash-table) things))
-
-  (typecase things
-    ;;; already good
-    (hash-table things)
+;;;=======================
+;;; CONSRUCTION OF VECTORS
+;;;=======================
     
-    ;;; convert the list in hash-table
-    (list 
-     (let ((vectors (make-hash-table :test 'equal)))
-       (loop for thing in things
-             ;; create a feature vector for each thing
-             do (if (consp thing)
-                    ;;; a pair key.vector (ht)
-                    (setf (gethash (car thing) vectors)
-                          (cdr thing))
-                  ;;; an empty vector
-                  (setf (gethash thing vectors)
-                        (make-hash-table :test #'equal))))
-       vectors))
-    
-    ;;; problem
-    (otherwise 
-     (format t "~&ERROR: the vector space must be initialized with a list or a hash-table~%")
-     nil) 
-    ))
-
 (defun make-feature-vectors (matrix features &optional names)
-  (let ((vectors (make-hash-table :test 'equal)))
-       (loop for element in matrix
-             for n = 0 then (+ n 1)
-             ;; create a feature vector for each thing
-             do (let ((vector (make-hash-table :test 'equal))
+  
+  (declare (type list matrix features names))
+  
+  (loop for element in matrix
+        for n = 0 then (+ n 1)
+        ;; create a feature vector for each thing
+        
+        collect (let ((vector (make-vs-vector))
                       (element-name (or (nth n names) (format nil "e-~d" n))))
                   (loop for feature in features
                         for value in element do
-                        (setf (gethash feature vector) value))
-                  (setf (gethash element-name vectors) vector)))
-       vectors))
-
+                        (setf (gethash feature (vs-vector-features vector)) value))
+                  (list element-name vector)))
+  )
+  
 
 ;;;=================
-;;; ACCESSORS
+;;; UTILS/ACCESSORS
 ;;;=================
 
 (defun get-feature-vector (vectors thing)
   "Retrieves the feature vector for a given object."
   (declare (type hash-table vectors))
-  (gethash thing vectors))
+  (let ((vs-vector (gethash thing vectors)))
+    (and vs-vector (vs-vector-features vs-vector))))
 
 (defun vector-count (vectors)
   "The number of elements in the vector space."
   (declare (type hash-table vectors))
   (hash-table-count vectors))
-
 
 (defun get-features (vectors thing n &optional print)
   "Prints a ranked list of <n> highest-value features for a given thing, unsorted list of all features if N = NIL."
@@ -118,9 +95,62 @@
       )))
 
 
-;;;=================
-;;; SIMILARITY
-;;;=================
+
+
+;;;======================
+;;; SIMILARITY/COMPARISON
+;;;======================
+
+; Destructively modifies a vector to have unit length.
+(defun normalize-vector (vector)  
+  (declare (type hash-table vector))
+  (let ((norm (euclid-norm vector))) 
+    (loop for key being the hash-keys of vector
+          using (hash-value n)
+          do (setf (gethash key vector) (/ n norm)))
+    vector))
+
+; returns a new vector with unit-length.
+(defun normalized-vector (vector)  
+  (declare (type hash-table vector))
+  (let ((norm (euclid-norm vector))
+        (normalized-vector (make-hash-table :test 'equal))) 
+    (loop for key being the hash-keys of vector
+          using (hash-value n)
+          do (setf (gethash key normalized-vector) (/ n norm)))
+    normalized-vector))
+
+
+(defmethod euclid-norm ((l list))
+  (sqrt (reduce #'+ (mapcar #'* l l))))
+
+(defmethod euclid-norm ((ht hash-table))
+  (sqrt 
+   (loop for value being each hash-value in ht
+         sum (* value value))))
+
+(defun dot-product  (hash1 hash2)
+  "Computes the inner product of two feature vectors."
+
+  (declare (hash-table hash1 hash2))
+
+  (loop for id1 being the hash-keys of hash1
+        for val2 = (gethash id1 hash2)
+        when val2
+        sum (* (gethash id1 hash1) val2)))
+
+(defun vector-diff (hash1 hash2)
+  "Computes the difference of two feature vectors."
+  
+  (declare (hash-table hash1 hash2))
+  
+  (let ((diff (make-hash-table :test 'equal)))
+    (loop for id1 being the hash-keys of hash1
+          for val2 = (gethash id1 hash2)
+          when val2
+          do (setf (gethash id1 diff) (- (gethash id1 hash1) val2)))
+    diff))
+
 
 (defmethod vector-similarity ((vectors hash-table) thing1 thing2 test)
   (let ((v1 (get-feature-vector vectors thing1))
@@ -128,165 +158,159 @@
     (when (and v1 v2)
       (funcall test v1 v2))))
 
-(defun dot-product  (hash1 hash2)
-  "Computes the inner product of two feature vectors."
-  (loop 
-      for id1 being the hash-keys of hash1
-      for val2 = (gethash id1 hash2)
-      when val2
-      sum (* (gethash id1 hash1) val2)))
+
 
 ;;;=================
-;;; NORMALIZATION
+;;; CLASS CENTROIDS
 ;;;=================
 
-(defun euclidean-length (vector-ht)
-  "Computes the Euclidean norm of a feature vector."
+;;; returns a vector with centroid value with all features found in vectors 
+(defun compute-centroids (vectors)
   
-  (declare (type hash-table vector-ht))
-
-  (sqrt
-   (loop for value being each hash-value in vector-ht
-         sum (expt value 2))))
-
-(defun length-normalize-vector (vector-ht)
-  "Destructively modifies a vector to have unit length."
+  (declare (type (or list hash-table) vectors))
   
-  (declare (type hash-table vector-ht))
-
-  (loop with length = (euclidean-length vector-ht)
-      for j being the hash-keys of vector-ht
-      using (hash-value n)
-      do (setf (gethash j vector-ht)
-               (/ n length)))
-  vector-ht)
-
-
-;;;=================
-;;; CLASSIFICATION
-;;;=================
-
-;; Classification data:
-;; each class label is used as a key in a hash-table, where for each class we
-;; store a property list with two keys, :members and :centroid.
-;; implements Rocchio algorithm for classification
-
-(defstruct vs-class (label) (members) (centroid))
-
-
-(defmethod read-classes-from-list ((classes list))
-  (loop for list in classes
-        for class = (first list)
-        for members = (second list)
-        collect (make-vs-class :label class :members members)))
-
-;;; not used
-(defmethod read-classes-from-file ((file pathname))
-   (with-open-file (stream file)
-     (loop for list = (read stream nil nil)
-           for class = (first list)
-           for members = (second list)
-           while list
-           collect (make-vs-class :label class :members members))))
-
-(defun initialize-classes (classes)
-  (declare (type list classes))
-  (read-classes-from-list classes))
+  (let ((centroids (make-hash-table :test #'equal))
+        (size (typecase vectors
+                (list (length vectors))
+                (hash-table (hash-table-count vectors)))))
+  
+    ;;; add values for each features
+    (typecase vectors 
+      (list 
+       (loop for vector in vectors do
+             (maphash #'(lambda (key val)
+                          (incf (gethash key centroids 0) val))
+                      vector)))
+      (hash-table 
+       (loop for vector being the hash-values of vectors do
+             (maphash #'(lambda (key val)
+                          (incf (gethash key centroids 0) val))
+                      (vs-vector-features vector))))
+      )
+      
+    ;;; normalize by number of vectors
+    (loop for key being the hash-keys of centroids
+          using (hash-value val)
+          do (setf (gethash key centroids) (/ val size)))
+  
+    centroids))
 
 
-
-;;;---------------------
-;;; COMPUTE CENTROIDS...
-;;;---------------------
-
-;;; check this. maybe issues with tests etc.
-
-(defun sum-vectors (&rest vectors)
-  (let ((sum (make-hash-table :test #'equal)))
-    (dolist (vec vectors)
-      (maphash #'(lambda (dim val)
-		   (incf (gethash dim sum 0) val))
-	       vec))
-    sum))
-          
-(defun vector-average (&rest vectors)
-  "Computes a centroid for an arbitrary number of vectors."
-  (let ((n (length vectors))
-        (sum (apply #'sum-vectors vectors)))
-    (maphash #'(lambda (dim val)
-                 (setf (gethash dim sum) (/ val n)))
-             sum)
-    sum))
+; Compute and store the average-vectors for each class from all vectors currently in this class.
 
 (defun compute-class-centroids (classes vectors)
-  "Compute and store the average-vectors for each class."
   
   (declare (type hash-table vectors)
            (type list classes))
   
   (loop for class in classes 
-        do (let* ((class-vectors (remove nil (mapcar 
-                                              #'(lambda (w) (get-feature-vector vectors w)) 
-                                              (vs-class-members class))))
-                  (centroid (length-normalize-vector (apply #'vector-average class-vectors))))
+        do (let* ((class-vectors (loop for member in (vs-class-members class)
+                                       for vector = (get-feature-vector vectors member)
+                                       when vector 
+                                       collect vector))
+                  (centroid (compute-centroids class-vectors)))
              (setf (vs-class-centroid class) centroid)))
   
   classes)
 
 
-;;;==================================================================
-;;; Implementation of the Rocchio algorithm for Information Retrieval
-;;;==================================================================
-
-(defun classify (vector classes sim-fn)
-  "Classifies vector according to centroid distance to classes."
+(defun class-likelihood (vector class sim-fn)
   
   (declare (type hash-table vector)
-           (type list class))
- 
-  (let ((named-centroids (loop for class in classes 
-                               collect (cons (vs-class-label class) (vs-class-centroid class)))))
-    (loop with max-label with max-sim = 0
-          for (label . center) in named-centroids
-          for sim = (funcall sim-fn vector center)
-          when (> sim max-sim)
-          do (setq max-label label max-sim sim)
-          finally (return (list max-label max-sim)))
-    ))
-   
+           (type vs-class class))
 
+  (funcall sim-fn 
+           (vs-vector-features vector) 
+           (normalized-vector (vs-class-centroid class)))
+  )
+
+
+;;;=================
+;;; INIT
+;;;=================
+
+(defmethod initialize-classes ((classes integer))
+  (loop for n from 1 to classes 
+        collect (make-vs-class :label (format nil "class-~D" n))))
+
+(defmethod initialize-classes ((classes list))
+  
+  (loop for class in classes 
+        for n from 1 collect
+        (cond 
+         ((typep class 'vs-class) ;; already formatted
+          class)
+         
+         ((and (consp class) (atom (car class)) (listp (cadr class)))  ; (id (member-IDs))
+          (make-vs-class :label (car class) :members (cadr class)))
+         
+         ((every #'atom class)   ; (members-IDs)
+          (make-vs-class :label (format nil "class-~D" (1+ n)) :members class))
+         
+         ((atom class) ; id 
+          (make-vs-class :label class :members nil))
+         
+         (t nil) ; problem
+         )
+        ))
+
+
+(defmethod initialize-vector-space ((input hash-table)) input)
+(defmethod initialize-vector-space ((input list))
+
+  (let ((vectors (make-hash-table :test 'equal)))
+    
+    (loop for thing in input
+          ;; create a feature vector for each thing
+          do (if (consp thing)
+                 
+                 ;;; a pair key.vector (ht)
+                 (setf (gethash (car thing) vectors) (cadr thing))
+               
+               ;;; an empty vector
+               (setf (gethash thing vectors) (make-vs-vector))))
+    
+    vectors))
 
 ;;;==================================
 ;;; OM OBJECT
 ;;;==================================
 
 (om::defclass! vector-space ()
-  ((vectors :initform nil :initarg :vectors :accessor vectors :documentation "hash-table containing vectors")
+  ((vectors :initform nil :initarg :vectors :accessor vectors :documentation "hash-table containing vs-vectors")
+   (features :initform nil :initarg :vectors :accessor features :documentation "a list of features used for display and clustering")
    (classes :initform nil :initarg :classes :accessor classes 
             :documentation "hash-table containing classes number of clustering")
    (similarity-fn :initform #'dot-product :accessor similarity-fn))
-  (:icon :omai))
+  (:icon :omai)
+  (:documentation "
+A structure to collect and visualize and clustering vectors.
+
+<vectors> should be objects of type (or subtype) of VS-VECTOR, that include a hast-table of features. 
+
+<features> is a list of feature identifiers (typically, strings) used for retrieving features in vs-vectors, and display/clustering them.
+
+<classes> is a list of VS-CLASS elements containing references to vector members.
+The classes can be computed on request, and/or given as input to VECTOR-SPACE.
+The partition of vector does not need to be total: some vectors can be member of no specific class (some algorithms can be used to retrieve the class of a vector given its similarity with current class members).
+Classes can also be empty for initialization of a certain number of clusters to be computed from the data-set.
+
+Allowed input formats for <classes> are:
+- List of VS-CLASSES
+- List of (class-ID (member-IDs)) 
+- List of class-IDs
+- Number (integer: ill create a corresponding number of anonymous, empty classes). 
+
+"))
       
 
 (defmethod initialize-instance :after ((self vector-space) &rest args)
   
   (setf (vectors self) (initialize-vector-space (vectors self)))
   
-  (setf (classes self) 
-        (typecase (classes self)
-          
-          ;;; list: classes are alreayd provided (just reformat)
-          (cons 
-           (initialize-classes (classes self)))
-        
-          ;;; integer: create classes by clustering (k-means)
-          (integer 
-           (k-means (vectors self) (classes self)))
-          
-          (otherwise nil)))
+  (setf (classes self) (initialize-classes (classes self)))
   
-  (when (classes self)
-    (compute-class-centroids (classes self) (vectors self)))
+  (compute-class-centroids (classes self) (vectors self))
   
   self)
 
@@ -296,14 +320,52 @@
   :initvals '(nil nil 10)
   (get-features (vectors self) thing n nil))
 
+
 (om::defmethod! get-similarity ((self vector-space) thing1 thing2)
   :icon :omai
   (vector-similarity (vectors self) thing1 thing2 (similarity-fn self)))
 
+
 (om::defmethod! get-class ((self vector-space) thing)
   :icon :omai
-  (when (classes self)
-    (classify (get-feature-vector (vectors self) thing) 
-              (classes self) 
-              (similarity-fn self))))
+  (let ((vector (gethash thing (vectors self))))
+    
+    (if vector
+        
+        (let ((classes (loop for class in (classes self) 
+                             when (find thing (vs-class-members class) :test 'equal)
+                             collect (vs-class-label class))))
+          (car classes))
+      
+      (om::om-beep-msg "~A not found in vector space" thing))))
+
+
+(om::defmethod! estimate-class ((self vector-space) thing)
+  :icon :omai
+  (let ((vector (gethash thing (vectors self))))
+    
+    (if vector
+        
+        (let ((scores (sort 
+                       (loop for class in (classes self) 
+                             collect (list (vs-class-label class)
+                                           (class-likelihood vector class (similarity-fn self))))
+                       '> :key 'cadr)))
+          (car scores))
+      
+      (om::om-beep-msg "~A not found in vector space" thing))))
   
+
+
+(defmethod classify ((self vector-space))
+  
+  (loop for vector-id being the hash-keys of (vectors self)
+        unless (get-class self vector-id)
+        do 
+        (let ((estimated-class (car (estimate-class self vector-id))))
+          (when estimated-class
+            (push vector-id 
+                  (vs-class-members (find estimated-class (classes self) :key 'vs-class-label :test 'equal)))))
+        ))
+                     
+

@@ -27,9 +27,10 @@
  (:source-files 
   (:pathname (:directory (:relative "sources")) (:name "package"))
   (:pathname (:directory (:relative "sources")) (:name "features"))
-  (:pathname (:directory (:relative "sources")) (:name "vector-space"))
-  (:pathname (:directory (:relative "sources")) (:name "words"))
   (:pathname (:directory (:relative "sources")) (:name "k-means"))
+  (:pathname (:directory (:relative "sources")) (:name "vector-space"))
+  (:pathname (:directory (:relative "sources")) (:name "vector-space-editor"))
+  (:pathname (:directory (:relative "sources")) (:name "words"))
   )
  (:symbols 
   (:functions "omai::vector-features" "omai::get-similarity" "omai::get-class" "omai::make-word-vectors")
