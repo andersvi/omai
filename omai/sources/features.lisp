@@ -156,12 +156,14 @@
     (float (/ (cdar (sort counts #'> :key #'cdr)) N))))
   
 (defmethod most-common-pitch-fraction ((self om::chord-seq))
+  "fraction of most common pitch vs all pitches"
   (let ((pitches (om::flat (om::lmidic self))))
     (most-common-value-factor pitches)))
 
 ;;;     P-5 Prevalence of Most Common Pitch Class
 
 (defmethod most-common-pc-fraction ((self om::chord-seq))
+  "P-5 Prevalence of Most Common Pitch Class"
   (let ((pcs (mapcar #'pitch->pc (om::flat (om::lmidic self)))))
     (most-common-value-factor pcs)))
 
