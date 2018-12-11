@@ -1,4 +1,3 @@
 # OMAI #
 
-repo to hold development of utilitities to explore AI/ML based
-techniques in composition workflows.
+A set of tools and algorithms for machine learning and artificial intellingence in OM.
