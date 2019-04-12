@@ -63,6 +63,19 @@
   (let ((vs-vector (gethash thing vectors)))
     (and vs-vector (vs-vector-features vs-vector))))
 
+(defmethod get-feature-value ((vector hash-table) key)
+  (gethash key vector))
+
+(defmethod get-feature-value ((vector vs-vector) key)
+  (get-feature-value (vs-vector-features vector)))
+
+
+(defun get-feature-values (vector keys)
+  (declare (type hash-table vector)
+           (type list keys))
+  (mapcar #'(lambda (key) (get-feature-value vector key)) keys))
+
+
 (defun vector-count (vectors)
   "The number of elements in the vector space."
   (declare (type hash-table vectors))
@@ -95,6 +108,9 @@
       )))
 
 
+(defmethod get-class-members ((class vs-class))
+  (vs-class-members class))
+
 
 
 ;;;======================
@@ -110,11 +126,12 @@
           do (setf (gethash key vector) (/ n norm)))
     vector))
 
+
 ; returns a new vector with unit-length.
 (defun normalized-vector (vector)  
   (declare (type hash-table vector))
   (let ((norm (euclid-norm vector))
-        (normalized-vector (make-hash-table :test 'equal))) 
+        (normalized-vector (make-hash-table :test 'equal)))
     (loop for key being the hash-keys of vector
           using (hash-value n)
           do (setf (gethash key normalized-vector) (/ n norm)))
@@ -198,20 +215,29 @@
 
 ; Compute and store the average-vectors for each class from all vectors currently in this class.
 
+(defun compute-class-centroid (class vectors)
+  
+  (declare (type hash-table vectors)
+           (type vs-class classes))
+  
+  (let* ((class-vectors (loop for member in (vs-class-members class)
+                              for vector = (get-feature-vector vectors member)
+                              when vector 
+                              collect vector))
+         (centroid (compute-centroids class-vectors)))
+    (setf (vs-class-centroid class) centroid))
+  
+  class)
+
 (defun compute-class-centroids (classes vectors)
   
   (declare (type hash-table vectors)
            (type list classes))
   
-  (loop for class in classes 
-        do (let* ((class-vectors (loop for member in (vs-class-members class)
-                                       for vector = (get-feature-vector vectors member)
-                                       when vector 
-                                       collect vector))
-                  (centroid (compute-centroids class-vectors)))
-             (setf (vs-class-centroid class) centroid)))
+  (mapcar #'(lambda (c) (compute-class-centroid c vectors)) classes)
   
-  classes)
+  )
+  
 
 
 (defun class-likelihood (vector class sim-fn)
@@ -223,6 +249,7 @@
            (vs-vector-features vector) 
            (normalized-vector (vs-class-centroid class)))
   )
+
 
 
 ;;;=================
@@ -342,12 +369,15 @@ Allowed input formats for <classes> are:
 
 (om::defmethod! estimate-class ((self vector-space) thing)
   :icon :omai
+  
   (let ((vector (gethash thing (vectors self))))
     
     (if vector
         
         (let ((scores (sort 
                        (loop for class in (classes self) 
+                             do (unless (vs-class-centroid class)
+                                  (compute-class-centroid class (vectors self)))
                              collect (list (vs-class-label class)
                                            (class-likelihood vector class (similarity-fn self))))
                        '> :key 'cadr)))
