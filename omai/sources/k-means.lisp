@@ -141,7 +141,7 @@
               for n from 0
               collect (make-vs-class :label (format nil "class-~D" n) :members (list element)))
         
-      ;;; main call here:
+      ;;; main case here:
       (let* ((init-state (initialize-centroids vectors k))
              (cluster-map (lloyd-km vectors nil init-state k))
              (clusters (make-clusters cluster-map vectors k)))

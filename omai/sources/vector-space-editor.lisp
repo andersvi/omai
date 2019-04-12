@@ -43,7 +43,7 @@
 
 (defun k-means-button (editor)
   (let ((vs (om::object-value editor)))
-    (setf (classes vs) (k-means (vectors vs) (length (classes vs))))
+    (setf (classes vs) (k-means (vectors vs) (max (length (classes vs)) 1)))
     (cache-vs-points editor)
     (oa:om-invalidate-view (om::main-view editor))))
 
@@ -114,11 +114,29 @@
                                                                      ))
                                       :separator
                                       nil
-                                      (oa::om-make-di 'oa::om-button :text "K-means" :font (oa::om-def-font :font1) :size (oa::omp 80 22)
-                                                      :di-action #'(lambda (b) (declare (ignore b))
-                                                                     (k-means-button editor)))
+                                      (oa::om-make-layout 
+                                       'oa::om-row-layout 
+                                       :subviews (list 
+                                                  (oa::om-make-di 'oa::om-button :text "K-means" :font (oa::om-def-font :font1) 
+                                                                  :size (oa::omp 76 24)
+                                                                  :di-action #'(lambda (b) (declare (ignore b))
+                                                                                 (init-colors editor)
+                                                                                 (k-means-button editor)))
+                                                  
+                                                  (oa::om-make-di 'oa:om-simple-text :text "N:" :font (oa::om-def-font :font1) 
+                                                                  :size (oa::omp 12 24))
+                                                  (om::set-g-component 
+                                                   editor :k-means-n 
+                                                   (oa::om-make-di 'om::numbox :font (oa::om-def-font :font1) :size (oa::omp 20 20)
+                                                                   :bg-color (oa:om-def-color :white)
+                                                                   :value (max (length (classes vs)) 1) :min-val 1
+                                                                   :after-fun #'(lambda (b)
+                                                                                  (setf (classes (om::object-value editor)) (initialize-classes (om::value b)))
+                                                                                  (oa:om-invalidate-view (om::main-view editor))))
+                                                   
+                                                   )))
                                       
-                                      (oa::om-make-di 'oa::om-button :text "Estimate" :font (oa::om-def-font :font1) :size (oa::omp 80 22)
+                                      (oa::om-make-di 'oa::om-button :text "Estimate class" :font (oa::om-def-font :font1) :size (oa::omp 100 24)
                                                       :di-action #'(lambda (b) (declare (ignore b))
                                                                      (estimate-button editor)))
                                       nil
@@ -153,6 +171,11 @@
     ))
 
 
+(defmethod init-colors ((editor vs-editor))
+  (setf (class-colors editor)
+        (loop repeat (length (classes (om::object-value editor))) 
+              collect (om::om-random-color))))
+
 (defmethod om::init-editor-window ((editor vs-editor))
   
   (call-next-method)
@@ -163,10 +186,10 @@
     (oa:om-set-item-list (om::get-g-component editor :y-menu) (features vs))
     (oa:om-set-item-list (om::get-g-component editor :z-menu) (features vs))
                          
-
+    (om::set-value (om::get-g-component editor :k-means-n) (max (length (classes vs)) 1))
+                   
     ;;; Pick an adequate number of random colors for classes
-    (setf (class-colors editor)
-          (loop repeat (length (classes vs)) collect (om::om-random-color)))
+    (init-colors editor)
     
     ;;; Set 3 dimensions for display if not set and/or if set values not among available features 
     (unless (and (om::editor-get-edit-param editor :dimension1)
@@ -224,21 +247,27 @@
   (oa:om-invalidate-view (om::main-view editor)))
 
 
+(defmethod om::editor-key-action ((editor vs-editor) key)
+  (case key
+    (#\c (init-colors editor)
+         (oa:om-invalidate-view (om::main-view editor)))
+    (otherwise (call-next-method))))
+
 ;;; Fill cached points and record the min-max range for each dimension
 ;;; call this each time display dimensions are modified
 (defun cache-vs-points (editor)
   
-  (print "CACHING VS POINTS...")
+  ;(print "CACHING VS POINTS...")
   
   (let ((vs (om::object-value editor))
         (d1 (om::editor-get-edit-param editor :dimension1))
         (d2 (om::editor-get-edit-param editor :dimension2))
         (d3 (om::editor-get-edit-param editor :dimension3)))
     
-    (print "DIMENSIONS:")
-    (print d1)
-    (print d2)
-    (print d3)
+    ;(print "DIMENSIONS:")
+    ;(print d1)
+    ;(print d2)
+    ;(print d3)
     
     (setf (cached-ranges editor) 
           (list (list nil nil) (list nil nil) (list nil nil)))
