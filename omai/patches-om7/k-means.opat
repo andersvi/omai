@@ -5,8 +5,8 @@
  (:doc "")
  (:info
   (:created "2018/11/22 17:38:35")
-  (:modified "2018/11/24 17:36:28"))
- (:window (:size (579 463)) (:position (848 157)))
+  (:modified "2019/04/12 23:09:09"))
+ (:window (:size (994 535)) (:position (46 23)))
  (:grid nil)
  (:lock nil)
  (:boxes
@@ -16,10 +16,10 @@
    (:type :object)
    (:group-id nil)
    (:name nil)
-   (:x 149)
-   (:y 252)
-   (:w 365)
-   (:h 58)
+   (:x 219)
+   (:y 232)
+   (:w 174)
+   (:h 74)
    (:color nil)
    (:border nil)
    (:roundness nil)
@@ -49,20 +49,20 @@
     (:input
      (:type :standard)
      (:name "CLASSES")
-     (:value nil)
+     (:value 4)
      (:reactive nil)))
    (:outputs
     (:output (:name "SELF") (:reactive nil))
     (:output (:name "VECTORS") (:reactive nil))
     (:output (:name "FEATURES") (:reactive nil))
     (:output (:name "CLASSES") (:reactive nil)))
-   (:window (:size (920 586)) (:position (134 380)))
+   (:window (:size (669 625)) (:position (333 358)))
    (:edition-params
-    (:show-ids nil)
-    (:dimension3 "feature-1")
-    (:dimension2 "feature-4")
+    (:show-ids t)
+    (:dimension3 "feature-3")
+    (:dimension2 "feature-2")
     (:dimension1 "feature-1")
-    (:view-mode :|3D|))
+    (:view-mode :|2D|))
    (:value
     (:object
      (:class (:symbol "VECTOR-SPACE" "OMAI"))
@@ -2081,16 +2081,16 @@
          "feature-3"
          "feature-4"
          "feature-5"))
-       (:classes (:list nil nil nil))))))
+       (:classes (:list nil nil nil nil))))))
    (:id 0))
   (:box
    (:reference (:symbol "MAKE-FEATURE-VECTORS" "OMAI"))
    (:type :function)
    (:group-id nil)
    (:name "make-feature-vectors")
-   (:x 91)
-   (:y 171)
-   (:w 220)
+   (:x 138)
+   (:y 181)
+   (:w 144)
    (:h 30)
    (:color nil)
    (:border nil)
@@ -2113,77 +2113,10 @@
    (:outputs (:output (:name "out") (:reactive nil)))
    (:id 1))
   (:box
-   (:reference cons)
-   (:type :value)
-   (:group-id nil)
-   (:name "value box")
-   (:x 11)
-   (:y 28)
-   (:w 149)
-   (:h 62)
-   (:color nil)
-   (:border nil)
-   (:roundness nil)
-   (:text-font nil)
-   (:align nil)
-   (:lock nil)
-   (:inputs)
-   (:outputs (:output (:name "value") (:reactive nil)))
-   (:value
-    (:list
-     (:list 3.0 7.0)
-     (:list 0.5 1.0)
-     (:list 0.8 0.5)
-     (:list 1.0 8.0)
-     (:list 0.9 1.2)
-     (:list 6.0 4.0)
-     (:list 7.0 5.5)
-     (:list 4.0 9.0)
-     (:list 9.0 4.0)))
-   (:id 2))
-  (:box
-   (:reference cons)
-   (:type :value)
-   (:group-id nil)
-   (:name "value box")
-   (:x 356)
-   (:y 58)
-   (:w 107)
-   (:h 30)
-   (:color nil)
-   (:border nil)
-   (:roundness nil)
-   (:text-font nil)
-   (:align nil)
-   (:lock nil)
-   (:inputs)
-   (:outputs (:output (:name "value") (:reactive nil)))
-   (:value (:list "feat-A" "feat-B"))
-   (:id 3))
-  (:box
-   (:reference fixnum)
-   (:type :value)
-   (:group-id nil)
-   (:name "value box")
-   (:x 454)
-   (:y 194)
-   (:w 32)
-   (:h 30)
-   (:color nil)
-   (:border nil)
-   (:roundness nil)
-   (:text-font nil)
-   (:align nil)
-   (:lock nil)
-   (:inputs)
-   (:outputs (:output (:name "value") (:reactive nil)))
-   (:value 3)
-   (:id 4))
-  (:box
    (:reference
     (:textfun
      (:om-version 0.0106999995)
-     (:name "v")
+     (:name "gen-dataset")
      (:doc "")
      (:info (:created nil) (:modified nil))
      (:window (:size nil) (:position nil))
@@ -2197,8 +2130,8 @@
    (:type :textfun)
    (:group-id nil)
    (:name "gen-dataset")
-   (:x 98)
-   (:y 132)
+   (:x 126)
+   (:y 130)
    (:w 97)
    (:h 28)
    (:color nil)
@@ -2223,17 +2156,18 @@
      (:value nil)
      (:reactive nil)))
    (:outputs (:output (:name "out") (:reactive nil)))
-   (:id 5))
+   (:id 2))
   (:box
    (:reference fixnum)
    (:type :value)
    (:group-id nil)
    (:name "value box")
-   (:x 104)
-   (:y 94)
+   (:x 132)
+   (:y 92)
    (:w 42)
    (:h 30)
-   (:color nil)
+   (:color
+    (:color-or-nil (:color (:color 1.0 1.0 1.0 1.0)) (:t-or-nil t)))
    (:border nil)
    (:roundness nil)
    (:text-font nil)
@@ -2242,17 +2176,18 @@
    (:inputs)
    (:outputs (:output (:name "value") (:reactive nil)))
    (:value 1000)
-   (:id 6))
+   (:id 3))
   (:box
    (:reference fixnum)
    (:type :value)
    (:group-id nil)
    (:name "value box")
-   (:x 288)
-   (:y 12)
+   (:x 230)
+   (:y 82)
    (:w 32)
    (:h 30)
-   (:color nil)
+   (:color
+    (:color-or-nil (:color (:color 1.0 1.0 1.0 1.0)) (:t-or-nil t)))
    (:border nil)
    (:roundness nil)
    (:text-font nil)
@@ -2261,7 +2196,7 @@
    (:inputs)
    (:outputs (:output (:name "value") (:reactive nil)))
    (:value 5)
-   (:id 7))
+   (:id 4))
   (:box
    (:reference
     (:textfun
@@ -2282,7 +2217,7 @@
    (:group-id nil)
    (:name "gen-feature-names")
    (:x 260)
-   (:y 106)
+   (:y 129)
    (:w 131)
    (:h 28)
    (:color nil)
@@ -2302,15 +2237,15 @@
      (:value nil)
      (:reactive nil)))
    (:outputs (:output (:name "out") (:reactive nil)))
-   (:id 8))
+   (:id 5))
   (:box
    (:library "omai")
    (:reference (:symbol "GET-SIMILARITY" "OMAI"))
    (:type :function)
    (:group-id nil)
    (:name "get-similarity")
-   (:x 179)
-   (:y 386)
+   (:x 224)
+   (:y 361)
    (:w 102)
    (:h 30)
    (:color nil)
@@ -2337,17 +2272,18 @@
      (:value nil)
      (:reactive nil)))
    (:outputs (:output (:name "out") (:reactive nil)))
-   (:id 9))
+   (:id 6))
   (:box
    (:reference simple-base-string)
    (:type :value)
    (:group-id nil)
    (:name "value box")
-   (:x 206)
-   (:y 341)
+   (:x 251)
+   (:y 321)
    (:w 49)
    (:h 30)
-   (:color nil)
+   (:color
+    (:color-or-nil (:color (:color 1.0 1.0 1.0 1.0)) (:t-or-nil t)))
    (:border nil)
    (:roundness nil)
    (:text-font nil)
@@ -2356,17 +2292,18 @@
    (:inputs)
    (:outputs (:output (:name "value") (:reactive nil)))
    (:value "e-12")
-   (:id 10))
+   (:id 7))
   (:box
    (:reference simple-base-string)
    (:type :value)
    (:group-id nil)
    (:name "value box")
-   (:x 264)
-   (:y 346)
+   (:x 309)
+   (:y 321)
    (:w 56)
    (:h 30)
-   (:color nil)
+   (:color
+    (:color-or-nil (:color (:color 1.0 1.0 1.0 1.0)) (:t-or-nil t)))
    (:border nil)
    (:roundness nil)
    (:text-font nil)
@@ -2375,49 +2312,1040 @@
    (:inputs)
    (:outputs (:output (:name "value") (:reactive nil)))
    (:value "e-300")
-   (:id 11)))
+   (:id 8))
+  (:box
+   (:library "omai")
+   (:reference (:symbol "VECTOR-SPACE" "OMAI"))
+   (:type :object)
+   (:group-id nil)
+   (:name nil)
+   (:x 685)
+   (:y 256)
+   (:w 168)
+   (:h 79)
+   (:color nil)
+   (:border nil)
+   (:roundness nil)
+   (:text-font (:font (:face "Calibri") (:size 12) (:style :italic)))
+   (:name nil)
+   (:display :text)
+   (:showname nil)
+   (:group-id nil)
+   (:lock nil)
+   (:lambda nil)
+   (:inputs
+    (:input
+     (:type :standard)
+     (:name "SELF")
+     (:value nil)
+     (:reactive nil))
+    (:input
+     (:type :standard)
+     (:name "VECTORS")
+     (:value nil)
+     (:reactive nil))
+    (:input
+     (:type :standard)
+     (:name "FEATURES")
+     (:value nil)
+     (:reactive nil))
+    (:input
+     (:type :standard)
+     (:name "CLASSES")
+     (:value nil)
+     (:reactive nil)))
+   (:outputs
+    (:output (:name "SELF") (:reactive nil))
+    (:output (:name "VECTORS") (:reactive nil))
+    (:output (:name "FEATURES") (:reactive nil))
+    (:output (:name "CLASSES") (:reactive nil)))
+   (:window (:size (690 586)) (:position (753 215)))
+   (:edition-params
+    (:show-ids nil)
+    (:dimension3 "feat-C")
+    (:dimension2 "feat-B")
+    (:dimension1 "feat-A")
+    (:view-mode :|2D|))
+   (:value
+    (:object
+     (:class (:symbol "VECTOR-SPACE" "OMAI"))
+     (:slots
+      ((:vectors
+        (:hash-table
+         (:keys
+          (:list
+           "e-86"
+           "e-47"
+           "e-72"
+           "e-33"
+           "e-76"
+           "e-37"
+           "e-62"
+           "e-139"
+           "e-138"
+           "e-23"
+           "e-133"
+           "e-132"
+           "e-131"
+           "e-130"
+           "e-137"
+           "e-66"
+           "e-136"
+           "e-179"
+           "e-135"
+           "e-178"
+           "e-134"
+           "e-27"
+           "e-91"
+           "e-173"
+           "e-172"
+           "e-171"
+           "e-170"
+           "e-52"
+           "e-177"
+           "e-176"
+           "e-175"
+           "e-174"
+           "e-13"
+           "e-95"
+           "e-56"
+           "e-17"
+           "e-81"
+           "e-99"
+           "e-42"
+           "e-85"
+           "e-46"
+           "e-71"
+           "e-89"
+           "e-32"
+           "e-75"
+           "e-36"
+           "e-61"
+           "e-129"
+           "e-79"
+           "e-128"
+           "e-22"
+           "e-123"
+           "e-122"
+           "e-121"
+           "e-120"
+           "e-127"
+           "e-65"
+           "e-126"
+           "e-169"
+           "e-125"
+           "e-168"
+           "e-124"
+           "e-26"
+           "e-163"
+           "e-90"
+           "e-162"
+           "e-161"
+           "e-160"
+           "e-51"
+           "e-167"
+           "e-69"
+           "e-166"
+           "e-165"
+           "e-164"
+           "e-12"
+           "e-94"
+           "e-55"
+           "e-16"
+           "e-80"
+           "e-98"
+           "e-41"
+           "e-59"
+           "e-84"
+           "e-45"
+           "e-70"
+           "e-88"
+           "e-31"
+           "e-49"
+           "e-74"
+           "e-35"
+           "e-119"
+           "e-60"
+           "e-118"
+           "e-78"
+           "e-21"
+           "e-39"
+           "e-113"
+           "e-112"
+           "e-111"
+           "e-110"
+           "e-117"
+           "e-64"
+           "e-116"
+           "e-159"
+           "e-115"
+           "e-158"
+           "e-114"
+           "e-25"
+           "e-153"
+           "e-152"
+           "e-151"
+           "e-150"
+           "e-157"
+           "e-50"
+           "e-68"
+           "e-156"
+           "e-199"
+           "e-155"
+           "e-198"
+           "e-154"
+           "e-11"
+           "e-29"
+           "e-93"
+           "e-193"
+           "e-192"
+           "e-191"
+           "e-190"
+           "e-54"
+           "e-197"
+           "e-196"
+           "e-195"
+           "e-194"
+           "e-15"
+           "e-97"
+           "e-40"
+           "e-58"
+           "e-19"
+           "e-83"
+           "e-44"
+           "e-9"
+           "e-87"
+           "e-8"
+           "e-30"
+           "e-48"
+           "e-7"
+           "e-6"
+           "e-5"
+           "e-4"
+           "e-73"
+           "e-3"
+           "e-34"
+           "e-2"
+           "e-1"
+           "e-0"
+           "e-109"
+           "e-108"
+           "e-77"
+           "e-20"
+           "e-38"
+           "e-103"
+           "e-102"
+           "e-101"
+           "e-100"
+           "e-107"
+           "e-63"
+           "e-106"
+           "e-149"
+           "e-105"
+           "e-148"
+           "e-104"
+           "e-24"
+           "e-143"
+           "e-142"
+           "e-141"
+           "e-140"
+           "e-147"
+           "e-146"
+           "e-67"
+           "e-189"
+           "e-145"
+           "e-188"
+           "e-144"
+           "e-10"
+           "e-28"
+           "e-92"
+           "e-183"
+           "e-182"
+           "e-181"
+           "e-180"
+           "e-53"
+           "e-187"
+           "e-186"
+           "e-185"
+           "e-184"
+           "e-14"
+           "e-96"
+           "e-57"
+           "e-18"
+           "e-82"
+           "e-43"))
+         (:vals
+          (:list
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil
+           nil))
+         (:test equal)))
+       (:vectors (:list "feat-A" "feat-B" "feat-C" "feat-D"))
+       (:classes (:list nil nil))))))
+   (:id 9))
+  (:box
+   (:reference textbuffer)
+   (:type :object)
+   (:group-id nil)
+   (:name nil)
+   (:x 627)
+   (:y 111)
+   (:w 104)
+   (:h 91)
+   (:color
+    (:color-or-nil
+     (:color
+      (:color
+       0.9999992847442627D0
+       0.9999744296073914D0
+       0.9999912977218628D0
+       1.0D0))
+     (:t-or-nil t)))
+   (:border nil)
+   (:roundness nil)
+   (:text-font (:font (:face "Calibri") (:size 12) (:style :italic)))
+   (:name nil)
+   (:display :mini-view)
+   (:showname t)
+   (:group-id nil)
+   (:lock :locked)
+   (:lambda nil)
+   (:inputs
+    (:input
+     (:type :standard)
+     (:name "SELF")
+     (:value nil)
+     (:reactive nil))
+    (:input
+     (:type :standard)
+     (:name "CONTENTS")
+     (:value nil)
+     (:reactive nil))
+    (:input
+     (:type :key)
+     (:name "read-mode")
+     (:value :lines-cols)
+     (:reactive :read-mode)))
+   (:outputs
+    (:output (:name "SELF") (:reactive nil))
+    (:output (:name "CONTENTS") (:reactive nil))
+    (:output (:name "read-mode") (:reactive nil)))
+   (:window (:size (nil nil)) (:position (nil nil)))
+   (:edition-params (:read-mode :lines-cols))
+   (:value
+    (:object
+     (:class textbuffer)
+     (:slots
+      ((:contents
+        (:list
+         "0.28 0.33 0.54 0.47"
+         "0.05 0.38 0.2 0.86"
+         "0.09 0.84 0.01 0.03"
+         "0.73 0.69 0.95 0.42"
+         "0.32 0.85 0.44 0.5"
+         "0.07 0.26 0.43 0.87"
+         "0.46 0.1 0.7 0.01"
+         "0.86 0.35 0.18 0.68"
+         "0.4 0.33 0.23 0.68"
+         "0.8 0.47 0.51 0.16"
+         "0.54 0.14 0.88 0.91"
+         "0.54 0.59 0.2 0.68"
+         "0.6 0.99 0.13 0.21"
+         "0.88 0.23 0.32 0.73"
+         "0.22 0.69 0.73 0.54"
+         "0.02 0.72 0.61 0.74"
+         "0.51 0.91 0.99 0.58"
+         "0.89 0.62 0.36 0.44"
+         "0.43 0.99 0.63 0.14"
+         "0.02 0.18 0.19 0.67"
+         "0.39 0.74 0.39 0.74"
+         "0.9 0.65 0.14 0.83"
+         "0.49 0.67 0.38 0.36"
+         "0.48 0.51 0.34 0.93"
+         "0.86 0.54 0.68 0.61"
+         "0.38 0.87 0.27 0.75"
+         "0.22 0.96 0.62 0.14"
+         "0.97 0.22 0.41 0.18"
+         "0.76 0.27 0.74 0.2"
+         "0.48 0.44 0.44 0.13"
+         "0.53 0.25 0.5 0.35"
+         "0.58 0.07 0.18 0.21"
+         "0.59 0.75 0.16 0.14"
+         "0.41 0.08 0.94 0.49"
+         "0.66 0.47 0.11 0.49"
+         "0.94 0.27 0.62 0.55"
+         "0.99 0.21 0.83 0.45"
+         "0.77 0.11 0.07 0.12"
+         "0.43 0.12 0.88 0.64"
+         "0.35 0.68 0.08 0.62"
+         "0.45 0.6 0.45 0.16"
+         "0.68 0.16 0.31 0.26"
+         "0.95 0.04 0.93 0.21"
+         "0.9 0.56 0.0 0.04"
+         "0.62 0.23 0.22 0.78"
+         "0.21 0.29 0.56 0.2"
+         "0.76 0.95 0.93 0.12"
+         "0.1 0.16 0.92 0.78"
+         "0.5 0.42 0.14 0.17"
+         "0.18 0.91 0.03 0.19"
+         "0.42 0.67 0.54 0.68"
+         "0.72 0.68 0.98 0.88"
+         "0.19 0.56 0.83 0.13"
+         "0.23 0.89 0.23 0.1"
+         "0.23 0.66 0.21 0.35"
+         "0.22 0.28 0.5 0.81"
+         "0.96 0.75 0.58 0.28"
+         "0.04 0.02 0.85 0.78"
+         "0.14 0.61 0.35 0.88"
+         "0.45 0.78 0.21 0.18"
+         "0.58 0.33 0.44 0.73"
+         "0.56 0.28 0.31 0.74"
+         "0.24 0.75 0.46 0.95"
+         "0.4 0.04 0.2 0.16"
+         "0.15 0.02 0.59 0.49"
+         "0.77 0.09 0.73 0.5"
+         "0.16 0.58 0.32 0.81"
+         "0.87 0.41 0.97 0.9"
+         "0.31 0.17 0.52 0.04"
+         "0.53 0.01 0.12 0.25"
+         "0.59 0.87 0.53 0.14"
+         "0.29 0.51 0.64 0.77"
+         "0.28 0.19 0.26 0.65"
+         "0.98 0.51 0.84 0.0"
+         "0.61 0.25 0.6 0.17"
+         "0.68 0.85 0.5 0.7"
+         "0.69 0.83 0.55 0.33"
+         "0.71 0.8 0.28 0.3"
+         "0.78 0.75 0.77 0.07"
+         "0.24 0.34 0.17 0.55"
+         "0.57 0.41 0.39 0.45"
+         "0.82 0.75 0.01 0.86"
+         "0.35 0.59 0.22 0.07"
+         "0.27 0.89 0.89 0.01"
+         "0.64 0.91 0.36 0.75"
+         "0.33 0.29 0.18 0.11"
+         "0.03 0.04 0.42 0.68"
+         "0.95 0.37 0.83 0.96"
+         "0.55 0.75 0.75 0.12"
+         "0.38 0.95 0.7 0.83"
+         "0.46 0.05 0.81 0.49"
+         "0.93 0.48 0.9 0.14"
+         "0.17 0.49 0.92 0.28"
+         "0.89 0.73 0.53 0.96"
+         "0.14 0.19 0.29 0.49"
+         "0.31 0.56 0.18 0.41"
+         "0.62 0.24 0.76 0.82"
+         "0.73 0.91 0.13 0.08"
+         "0.2 0.02 0.97 0.54"
+         "0.91 0.64 0.35 0.54"
+         "0.62 0.97 0.44 0.68"
+         "0.38 0.14 0.96 0.73"
+         "0.99 0.23 0.56 0.67"
+         "0.97 0.96 0.9 0.61"
+         "0.83 0.46 0.47 0.75"
+         "0.89 0.49 0.7 0.46"
+         "0.25 0.08 0.57 0.11"
+         "0.02 0.92 0.23 0.54"
+         "0.88 0.41 0.34 0.52"
+         "0.13 0.31 0.23 0.43"
+         "0.57 0.64 0.47 0.16"
+         "0.62 0.14 0.03 0.27"
+         "0.05 0.11 0.02 0.01"
+         "0.27 0.76 0.52 0.21"
+         "0.85 0.02 0.91 0.63"
+         "0.26 0.32 0.42 0.16"
+         "0.2 0.5 0.12 0.58"
+         "0.04 0.63 0.46 0.87"
+         "0.58 0.76 0.91 0.12"
+         "0.83 0.98 0.46 0.28"
+         "0.59 0.37 0.64 0.18"
+         "0.54 0.31 0.04 0.6"
+         "0.84 0.64 0.07 0.34"
+         "0.22 0.88 0.43 0.58"
+         "0.59 0.06 0.74 0.97"
+         "0.36 0.73 0.69 0.06"
+         "0.39 0.66 0.81 0.31"
+         "0.83 0.25 0.81 0.22"
+         "0.9 0.69 0.61 0.54"
+         "0.66 0.59 0.78 0.45"
+         "0.54 0.67 0.36 0.99"
+         "0.18 0.56 0.0 0.51"
+         "0.92 0.29 0.49 0.16"
+         "0.71 0.45 0.82 0.28"
+         "0.33 0.15 0.08 0.97"
+         "0.99 0.74 0.29 0.18"
+         "0.74 0.7 0.57 0.06"
+         "0.35 0.58 0.46 0.34"
+         "0.03 0.81 0.88 0.79"
+         "0.14 0.24 0.02 0.35"
+         "0.96 0.74 0.15 0.59"
+         "0.9 0.88 0.44 0.43"
+         "0.31 0.46 0.72 0.29"
+         "0.72 0.91 0.88 0.05"
+         "0.17 0.23 0.33 0.7"
+         "0.24 0.89 0.27 0.6"
+         "0.59 0.67 0.66 0.35"
+         "0.69 0.72 0.12 0.46"
+         "0.54 0.04 0.28 0.45"
+         "0.56 0.06 0.79 0.23"
+         "0.8 0.76 0.04 0.82"
+         "0.35 0.61 0.63 0.4"
+         "0.55 0.45 0.49 0.29"
+         "0.1 0.47 0.77 0.64"
+         "0.19 0.87 0.71 0.44"
+         "0.5 0.22 0.54 0.26"
+         "0.47 0.33 0.54 0.26"
+         "0.49 0.04 0.93 0.78"
+         "0.79 0.54 0.53 0.99"
+         "0.74 0.37 0.23 0.86"
+         "0.53 0.41 0.48 0.58"
+         "0.34 0.35 0.16 0.87"
+         "0.97 0.35 0.18 0.91"
+         "0.83 0.16 0.58 0.54"
+         "0.94 0.35 0.69 0.71"
+         "0.36 0.63 0.41 0.34"
+         "0.26 0.77 0.67 0.16"
+         "0.48 0.16 0.06 0.84"
+         "0.05 0.61 0.77 0.4"
+         "0.71 0.2 0.37 0.27"
+         "0.25 0.95 0.2 0.39"
+         "0.92 0.55 0.13 0.8"
+         "0.3 0.02 0.9 0.21"
+         "0.39 0.28 0.73 0.82"
+         "0.09 0.7 0.1 0.42"
+         "0.71 0.24 0.6 0.95"
+         "0.48 0.1 0.58 0.08"
+         "0.13 0.03 0.74 0.0"
+         "0.71 0.6 0.56 0.38"
+         "0.05 0.07 0.08 0.22"
+         "0.38 0.25 0.9 0.87"
+         "0.67 0.44 0.0 0.09"
+         "0.23 0.98 0.79 0.68"
+         "0.76 0.37 0.25 0.01"
+         "0.15 0.31 0.3 0.6"
+         "0.55 0.88 0.51 0.75"
+         "0.15 0.11 0.61 0.31"
+         "0.52 0.83 0.54 0.94"
+         "0.43 0.56 0.75 1.0"
+         "0.97 0.2 0.49 0.61"
+         "0.25 0.38 0.08 0.58"
+         "0.97 0.87 0.45 0.11"
+         "0.03 0.35 0.36 0.59"
+         "0.26 0.11 0.67 0.69"
+         "0.46 0.61 0.02 0.76"
+         "0.56 0.94 0.85 0.59"
+         "0.52 0.76 0.69 0.7"
+         "0.48 0.82 0.26 0.7"
+         "0.64 0.31 0.5 0.14"
+         "0.99 0.42 0.19 0.92"))))
+     (:add-slots ((:input-mode :lines-cols)))))
+   (:id 10))
+  (:box
+   (:reference (:symbol "MAKE-FEATURE-VECTORS" "OMAI"))
+   (:type :function)
+   (:group-id nil)
+   (:name "make-feature-vectors")
+   (:x 638)
+   (:y 214)
+   (:w 144)
+   (:h 30)
+   (:color nil)
+   (:border nil)
+   (:roundness nil)
+   (:text-font nil)
+   (:align nil)
+   (:lock nil)
+   (:lambda nil)
+   (:inputs
+    (:input
+     (:type :standard)
+     (:name "MATRIX")
+     (:value nil)
+     (:reactive nil))
+    (:input
+     (:type :standard)
+     (:name "FEATURES")
+     (:value nil)
+     (:reactive nil)))
+   (:outputs (:output (:name "out") (:reactive nil)))
+   (:id 11))
+  (:box
+   (:reference cons)
+   (:type :value)
+   (:group-id nil)
+   (:name "value box")
+   (:x 754)
+   (:y 111)
+   (:w 67)
+   (:h 79)
+   (:color
+    (:color-or-nil (:color (:color 1.0 1.0 1.0 1.0)) (:t-or-nil t)))
+   (:border nil)
+   (:roundness nil)
+   (:text-font nil)
+   (:align nil)
+   (:lock nil)
+   (:inputs)
+   (:outputs (:output (:name "value") (:reactive nil)))
+   (:value (:list "feat-A" "feat-B" "feat-C" "feat-D"))
+   (:id 12))
+  (:box
+   (:reference null)
+   (:type :value)
+   (:group-id nil)
+   (:name "value box")
+   (:x 811)
+   (:y 224)
+   (:w 32)
+   (:h 30)
+   (:color
+    (:color-or-nil (:color (:color 1.0 1.0 1.0 1.0)) (:t-or-nil t)))
+   (:border nil)
+   (:roundness nil)
+   (:text-font nil)
+   (:align nil)
+   (:lock nil)
+   (:inputs)
+   (:outputs (:output (:name "value") (:reactive nil)))
+   (:value 2)
+   (:id 13))
+  (:comment
+   (:x 406)
+   (:y 63)
+   (:w 121)
+   (:h 19)
+   (:fgcolor nil)
+   (:bgcolor nil)
+   (:border nil)
+   (:roundness nil)
+   (:text-font nil)
+   (:align nil)
+   (:text "Build a VECTOR-SPACE")
+   (:id 14))
+  (:comment
+   (:x 400)
+   (:y 132)
+   (:w 84)
+   (:h 22)
+   (:fgcolor nil)
+   (:bgcolor nil)
+   (:border nil)
+   (:roundness nil)
+   (:text-font nil)
+   (:align nil)
+   (:text "dummy names")
+   (:id 15))
+  (:comment
+   (:x 38)
+   (:y 133)
+   (:w 84)
+   (:h 22)
+   (:fgcolor nil)
+   (:bgcolor nil)
+   (:border nil)
+   (:roundness nil)
+   (:text-font nil)
+   (:align nil)
+   (:text "random data")
+   (:id 16))
+  (:box
+   (:library "omai")
+   (:reference (:symbol "ESTIMATE-CLASS" "OMAI"))
+   (:type :function)
+   (:group-id nil)
+   (:name "estimate-class")
+   (:x 416)
+   (:y 366)
+   (:w 107)
+   (:h 30)
+   (:color nil)
+   (:border nil)
+   (:roundness nil)
+   (:text-font nil)
+   (:align nil)
+   (:lock nil)
+   (:lambda nil)
+   (:inputs
+    (:input
+     (:type :standard)
+     (:name "SELF")
+     (:value nil)
+     (:reactive nil))
+    (:input
+     (:type :standard)
+     (:name "THING")
+     (:value nil)
+     (:reactive nil)))
+   (:outputs (:output (:name "out") (:reactive nil)))
+   (:id 17))
+  (:box
+   (:reference simple-base-string)
+   (:type :value)
+   (:group-id nil)
+   (:name "value box")
+   (:x 472)
+   (:y 322)
+   (:w 49)
+   (:h 30)
+   (:color
+    (:color-or-nil (:color (:color 1.0 1.0 1.0 1.0)) (:t-or-nil t)))
+   (:border nil)
+   (:roundness nil)
+   (:text-font nil)
+   (:align nil)
+   (:lock nil)
+   (:inputs)
+   (:outputs (:output (:name "value") (:reactive nil)))
+   (:value "e-12")
+   (:id 18))
+  (:box
+   (:reference (:symbol "CLASSES" "OMAI"))
+   (:type :function)
+   (:group-id nil)
+   (:name "classes")
+   (:x 138)
+   (:y 414)
+   (:w 72)
+   (:h 30)
+   (:color nil)
+   (:border nil)
+   (:roundness nil)
+   (:text-font nil)
+   (:align nil)
+   (:lock nil)
+   (:lambda nil)
+   (:inputs
+    (:input
+     (:type :standard)
+     (:name "VECTOR-SPACE")
+     (:value nil)
+     (:reactive nil)))
+   (:outputs (:output (:name "out") (:reactive nil)))
+   (:id 19))
+  (:box
+   (:reference (:symbol "K-MEANS" "OMAI"))
+   (:type :function)
+   (:group-id nil)
+   (:name "k-means")
+   (:x 539)
+   (:y 402)
+   (:w 79)
+   (:h 30)
+   (:color nil)
+   (:border nil)
+   (:roundness nil)
+   (:text-font nil)
+   (:align nil)
+   (:lock nil)
+   (:lambda nil)
+   (:inputs
+    (:input
+     (:type :standard)
+     (:name "VECTORS")
+     (:value nil)
+     (:reactive nil))
+    (:input
+     (:type :standard)
+     (:name "K")
+     (:value nil)
+     (:reactive nil)))
+   (:outputs (:output (:name "out") (:reactive nil)))
+   (:id 20))
+  (:box
+   (:reference null)
+   (:type :value)
+   (:group-id nil)
+   (:name "value box")
+   (:x 580)
+   (:y 367)
+   (:w 32)
+   (:h 30)
+   (:color
+    (:color-or-nil (:color (:color 1.0 1.0 1.0 1.0)) (:t-or-nil t)))
+   (:border nil)
+   (:roundness nil)
+   (:text-font nil)
+   (:align nil)
+   (:lock nil)
+   (:inputs)
+   (:outputs (:output (:name "value") (:reactive nil)))
+   (:value 4)
+   (:id 21)))
  (:connections
   (:connection
    (:from (:box 0 :out 0))
-   (:to (:box 9 :in 0))
+   (:to (:box 6 :in 0))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 0 :out 0))
+   (:to (:box 17 :in 0))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 0 :out 0))
+   (:to (:box 19 :in 0))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 0 :out 1))
+   (:to (:box 20 :in 0))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
    (:from (:box 1 :out 0))
    (:to (:box 0 :in 1))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
-   (:from (:box 4 :out 0))
-   (:to (:box 0 :in 3))
-   (:attributes (:color nil :style nil :modif nil)))
-  (:connection
-   (:from (:box 5 :out 0))
+   (:from (:box 2 :out 0))
    (:to (:box 1 :in 0))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
-   (:from (:box 6 :out 0))
+   (:from (:box 3 :out 0))
+   (:to (:box 2 :in 0))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 4 :out 0))
    (:to (:box 5 :in 0))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
-   (:from (:box 7 :out 0))
-   (:to (:box 8 :in 0))
+   (:from (:box 4 :out 0))
+   (:to (:box 2 :in 1))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
-   (:from (:box 7 :out 0))
-   (:to (:box 5 :in 1))
-   (:attributes (:color nil :style nil :modif nil)))
-  (:connection
-   (:from (:box 8 :out 0))
-   (:to (:box 0 :in 2))
-   (:attributes (:color nil :style nil :modif nil)))
-  (:connection
-   (:from (:box 8 :out 0))
+   (:from (:box 5 :out 0))
    (:to (:box 1 :in 1))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
-   (:from (:box 10 :out 0))
-   (:to (:box 9 :in 1))
+   (:from (:box 5 :out 0))
+   (:to (:box 0 :in 2))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 7 :out 0))
+   (:to (:box 6 :in 1))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 8 :out 0))
+   (:to (:box 6 :in 2))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 10 :out 1))
+   (:to (:box 11 :in 0))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
    (:from (:box 11 :out 0))
+   (:to (:box 9 :in 1))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 12 :out 0))
+   (:to (:box 11 :in 1))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 12 :out 0))
    (:to (:box 9 :in 2))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 13 :out 0))
+   (:to (:box 9 :in 3))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 18 :out 0))
+   (:to (:box 17 :in 1))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 21 :out 0))
+   (:to (:box 20 :in 1))
    (:attributes (:color nil :style nil :modif nil)))))
