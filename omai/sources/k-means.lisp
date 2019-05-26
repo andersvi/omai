@@ -123,7 +123,7 @@
 
 ;;; returns a list of groups (classes) 
 ;;; observations is an HT of feature-vectors
-(defun k-means (vectors k)
+(defun k-means-ht (vectors k)
 
   (declare (type hash-table vectors)
            (type integer k))
@@ -134,28 +134,45 @@
  
       (progn (format t "k >= observations !!") nil)
     
-    (if (= (hash-table-count vectors) k) 
+      (if (= (hash-table-count vectors) k) 
         
-        ;;; just make one class with each observation vector
-        (loop for element being the hash-keys of vectors
-              for n from 0
-              collect (make-vs-class :label (format nil "class-~D" n) :members (list element)))
+;;; just make one class with each observation vector
+          (loop for element being the hash-keys of vectors
+             for n from 0
+             collect (make-vs-class :label (format nil "class-~D" n) :members (list element)))
         
-      ;;; main case here:
-      (let* ((init-state (initialize-centroids vectors k))
-             (cluster-map (lloyd-km vectors nil init-state k))
-             (clusters (make-clusters cluster-map vectors k)))
-        ;;;(map-clusters cluster-map vectors 0 k)
+;;; main case here:
+	  (let* ((init-state (initialize-centroids vectors k))
+		 (cluster-map (lloyd-km vectors nil init-state k))
+		 (clusters (make-clusters cluster-map vectors k)))
+;;;(map-clusters cluster-map vectors 0 k)
         
-        (loop for cluster in clusters 
-              for n from 0 
-              collect (make-vs-class 
-                       :label (format nil "class-~D" n) 
-                       :members (loop for key being the hash-keys of cluster collect key))))
-      )
-    )
-  )
-    
+            (loop for cluster in clusters 
+               for n from 0 
+               collect (make-vs-class 
+			:label (format nil "class-~D" n) 
+			:members (loop for key being the hash-keys of cluster collect key))))
+	  )))
+
+;; input: hash-table, ie. from vector-space
+
+(defmethod k-means ((vectors hash-table) k)
+  (k-means-ht vectors k))
+
+;; input: list-of-vectors, output: k clusters
+;; to use directly on any unstructured data list (e.g. lmidic)
+
+(defmethod k-means ((vectors list) k)
+  (let* ((fvs (make-feature-vectors vectors vectors vectors))
+	 (vs (om::mki 'vector-space :vectors fvs)))
+    (mapcar #'vs-class-members (k-means (vectors vs) k))))
+
+;; (setf fff (loop repeat 20 collect (loop repeat 3 collect (random 10))))
+;; (k-means fff 4)
+;; (setf vvv (om::mki 'vector-space :vectors (make-feature-vectors fff fff fff)))
+;; (vectors vvv)
+;; (k-means (vectors vvv) 4)
+;; (mapcar #'vs-class-members (k-means (vectors vvv) 4))
 
 
 #|
