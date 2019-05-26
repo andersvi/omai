@@ -85,7 +85,7 @@
 
 
 ;;================================
-; returns a list of cluser: each cluster is a hash-table of vectors
+; returns a list of cluster: each cluster is a hash-table of vectors
 (defun make-clusters (clusters-map vectors k)
   (let ((clusters (make-list k)))
     (loop for elt in clusters-map do
