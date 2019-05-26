@@ -305,7 +305,7 @@
 
 (om::defclass! vector-space ()
   ((vectors :initform nil :initarg :vectors :accessor vectors :documentation "hash-table containing vs-vectors")
-   (features :initform nil :initarg :vectors :accessor features :documentation "a list of features used for display and clustering")
+   (features :initform nil :initarg :features :accessor features :documentation "a list of features used for display and clustering")
    (classes :initform nil :initarg :classes :accessor classes 
             :documentation "hash-table containing classes number of clustering")
    (similarity-fn :initform #'dot-product :accessor similarity-fn))
