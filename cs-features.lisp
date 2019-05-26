@@ -67,19 +67,19 @@
 		   (flat l)))
 	   (mapcar #'(lambda (p) (funcall p self)) parameter-list))))
 
-(defun split-cs-by-features (cs k)
-  (let ((parameter-list '(lmidic ldur lvel)))
-    ))
+;; (defun split-cs-by-features (cs k)
+;;   (let ((parameter-list '(lmidic ldur lvel)))
+;;     ))
 
-(defclass chord-w-class (chord)
-  ((class :initarg nil :class :accessor class)))
+;; (defclass chord-w-class (chord)
+;;   ((class :initarg nil :class :accessor class)))
 
-(mki 'chord-w-class)
+;; (mki 'chord-w-class)
 
-(let ((a (mki 'chord-seq)))
-  (setf (inside a) (loop repeat 10 collect (mki 'chord-w-class :ldur (random 10) :lmidic (* 100 (om-random 48 72)))))
-  (setf (lonset a) '(0 100))
-  (lonset a))
+;; (let ((a (mki 'chord-seq)))
+;;   (setf (inside a) (loop repeat 10 collect (mki 'chord-w-class :ldur (random 10) :lmidic (* 100 (om-random 48 72)))))
+;;   (setf (lonset a) '(0 100))
+;;   (lonset a))
 
 (defmethod extract-feature-vectors ((self chord-seq) &optional (parameter-list '(lmidic ldur lvel)) (normalize t))
   (mat-trans
