@@ -68,7 +68,7 @@
 (defun lloyd-km (vectors cluster-map centroids k)
   
   (declare (type hash-table vectors)
-           (type list clusters centroids)
+           (type list cluster-map centroids)
            (type integer k))
 
   (let ((new-cluster-map (get-cluster-map vectors centroids)))
