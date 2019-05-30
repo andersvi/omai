@@ -34,7 +34,7 @@
   )
  (:symbols 
   (:functions 
-   "omai::vector-features" 
+   "omai::get-feature-values" 
    "omai::get-similarity" 
    "omai::get-class" 
    "omai::estimate-class" 

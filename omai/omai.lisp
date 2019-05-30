@@ -31,7 +31,7 @@
 (compile&load (merge-pathnames "sources/words" *load-pathname*))
 
 (om::fill-library 
- '((nil nil (omai::vector-space) (omai::vector-features omai::get-class omai::get-similarity omai::make-word-vectors) nil)))
+ '((nil nil (omai::vector-space) (omai::get-feature-values omai::get-class omai::get-similarity omai::estimate-class omai::make-word-vectors) nil)))
 
 (om::om-print "==============================" )
 (om::om-print "OMAI - AI Tools for OM" )
