@@ -106,15 +106,15 @@ Allowed input formats for <classes> are:
 
 (defmethod initialize-features ((features list) (vector-ht hash-table))
   
-  (let ((max-vector-size (print (loop for vect being the hash-values in vector-ht
-                               maximize (length vect)))))
+  (let ((max-vector-size (loop for vect being the hash-values in vector-ht
+                               maximize (length vect))))
     
     (if (< (length features) max-vector-size)
-        (print (append features 
-                       (loop for i from (1+ (length features))
-                             to max-vector-size
-                             collect (format nil "feat_~D" i))))
-        features)
+        (append features 
+                (loop for i from (1+ (length features))
+                      to max-vector-size
+                      collect (format nil "feat_~D" i)))
+      features)
     ))
 
 ;;;=================
