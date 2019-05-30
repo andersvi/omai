@@ -108,6 +108,15 @@ Allowed input formats for <classes> are:
 ;;; UTILS/ACCESSORS
 ;;;=================
 
+(defmethod vector-count ((self hash-table))
+  "The number of elements in the vector space"
+  (hash-table-count self))
+
+(defmethod vector-count ((self vector-space))
+  (vector-count (vectors self)))
+
+
+
 (defmethod get-feature-vector ((self hash-table) thing)
   "Retrieves the feature vector for a given object."
   (gethash thing self))
@@ -126,43 +135,27 @@ Allowed input formats for <classes> are:
   (let ((v (get-feature-vector self vector)))
     (get-feature-value self v feature)))
 
+
+
 ;;; vector = a vector (list) or a vector-ht key
-(defmethod get-feature-values ((self vector-space) vector (features list))
-  (mapcar #'(lambda (key) (get-feature-value self vector key)) features))
-
-
-(defmethod vector-count ((self hash-table))
-  "The number of elements in the vector space"
-  (hash-table-count self))
-
-(defmethod vector-count ((self vector-space))
-  (vector-count (vectors self)))
-
-
-
-(om::defmethod! vector-features ((self vector-space) thing &optional n print)  
-  :initvals '(nil nil 10)
-  :indoc '("a vector-space" "a vector id/label" "number of main features (or NIL)" "print values?")
-  :outdoc '("list of feature/value pairs")
+(om::defmethod! get-feature-values ((self vector-space) vector &optional features)
   :icon :omai
-  :doc "Returns a ranked list of (n) highest-value features for a given thing, or unsorted list of all features if n = NIL."
-  (let ((vector (get-feature-vector self thing)))
-    
-    (if vector
-        (let* ((pairs (loop for val in vector
-                            for feat in (features self)
-                            collect (list feat val)))
-               (sorted (if n (sort pairs #'> :key #'cadr) pairs)))
-          
-          (when print 
-            (loop for item in sorted 
-                  do (print (format nil "~&~a ~a~%" (car item) (cadr item)))))
-          
-          sorted)
-      
-          (format t "~&ERROR: ~S in not registered in the vector space~%" thing)
-       
-      )))
+  :numouts 2 
+  :indoc '("a vector-space" "a vector identifier in the vector-space" "a list of feature (or NIL)")
+  :outdoc '("list of values" "list of features")
+  :doc "Returns the feature values of <vector> (a vector ID).
+
+
+If <features is not provided the values of all features are returned.
+
+The second output returns the list of features."
+  
+
+  (let ((feats (or features (features self)))) 
+    (values (mapcar #'(lambda (key) (get-feature-value self vector key)) feats)
+            feats)
+    ))
+
 
 
 ;;;=============================
