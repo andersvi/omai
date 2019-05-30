@@ -33,7 +33,12 @@
   (:pathname (:directory (:relative "sources")) (:name "words"))
   )
  (:symbols 
-  (:functions "omai::vector-features" "omai::get-similarity" "omai::get-class" "omai::make-word-vectors")
+  (:functions 
+   "omai::vector-features" 
+   "omai::get-similarity" 
+   "omai::get-class" 
+   "omai::estimate-class" 
+   "omai::make-word-vectors")
   (:classes "omai::vector-space"))
 )
 
