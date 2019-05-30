@@ -29,7 +29,7 @@
 
 ; Returns the centroid with lower distance to vector 
 (defun get-closer-centroid (vector centroids max-distance result)
-  (declare (type vs-vector vector)
+  (declare (type list vector)
            (type list centroids)
            (type number max-distance))
   
@@ -38,7 +38,7 @@
    ((null (car centroids)) (get-closer-centroid vector (cdr centroids) max-distance result))
         
    (t (let* ((c (car centroids))
-             (new-distance (euclid-norm (vector-diff (vs-vector-features vector) c))))
+             (new-distance (euclid-norm (vector-diff vector c))))
         (if (< new-distance max-distance)
             (get-closer-centroid vector (cdr centroids) new-distance c)
          (get-closer-centroid vector (cdr centroids) max-distance result))
@@ -65,7 +65,7 @@
    )
 
 
-(defun lloyd-km (vectors cluster-map centroids k)
+(defun lloyd-km (vectors cluster-map centroids k size)
   
   (declare (type hash-table vectors)
            (type list clusters centroids)
@@ -79,8 +79,8 @@
       
       (lloyd-km vectors new-cluster-map
                 (loop for cluster-vectors in (make-clusters new-cluster-map vectors k)
-                      collect (compute-centroids cluster-vectors))
-                k))))
+                      collect (compute-centroids cluster-vectors size))
+                k size))))
 
 
 
@@ -106,7 +106,7 @@
   
   (if (= k 0) nil
     (let ((rand-key (nth (random (length keys)) keys)))
-      (cons (vs-vector-features (gethash rand-key vectors))
+      (cons (gethash rand-key vectors)
             (rec-collect-random-vectors (remove rand-key keys) vectors (1- k))))))
 
 (defun initialize-centroids (vectors k)
@@ -121,9 +121,9 @@
 ;;; main function
 ;;;========================
 
-;;; returns a list of groups (classes) 
-;;; observations is an HT of feature-vectors
-(defun k-means (vectors k)
+;;; returns a list of k groups (classes) 
+;;; observations is an HT of feature-vectors of dimension size
+(defun compute-k-means (vectors k size)
 
   (declare (type hash-table vectors)
            (type integer k))
@@ -139,17 +139,17 @@
         ;;; just make one class with each observation vector
         (loop for element being the hash-keys of vectors
               for n from 0
-              collect (make-vs-class :label (format nil "class-~D" n) :members (list element)))
+              collect (make-instance 'vs-class :label (format nil "class-~D" n) :members (list element)))
         
       ;;; main case here:
       (let* ((init-state (initialize-centroids vectors k))
-             (cluster-map (lloyd-km vectors nil init-state k))
+             (cluster-map (lloyd-km vectors nil init-state k size))
              (clusters (make-clusters cluster-map vectors k)))
         ;;;(map-clusters cluster-map vectors 0 k)
         
         (loop for cluster in clusters 
               for n from 0 
-              collect (make-vs-class 
+              collect (make-instance 'vs-class
                        :label (format nil "class-~D" n) 
                        :members (loop for key being the hash-keys of cluster collect key))))
       )
@@ -157,6 +157,13 @@
   )
     
 
+(om::defmethod! k-means ((self vector-space) (k integer))
+  :icon :omai
+  :doc "Returns a liust of <k> class computed form observations in <self> by k-means."
+  :indoc '("a vector-space" "number of classes wanted")
+  :outdoc '("list of vs-class objects")
+  :initvals '(nil 2)
+  (compute-k-means (vectors self) k (length (features self))))
 
 #|
 

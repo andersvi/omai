@@ -97,7 +97,7 @@
 ;; updating the counts in the feature vectors: 
 
 ;;; generates a vector-space (hash-table of vectors)
-(defun vs-learn-line-of-text (vectors line)
+(defun vs-learn-line-of-text (vectors line feature-words)
   ;; nested loop to (1) find target words, and (2) for each
   ;; target extract features and update its feature vector:
   
@@ -112,20 +112,22 @@
         do (loop for feature in tokens
                  for j from 0
                  unless (= i j)  ;;; we don't count a token occurrence as a feature of itself:
-                 do (incf (gethash feature (vs-vector-features feat-vect) 0)))
-        ))
+                 do (let ((p (position feature feature-words :test 'equal)))
+                      (when p (setf (nth p feat-vect) (1+ (nth p feat-vect)))))
+                 ))
+  )
 
 ; Learns from corpus 
-(defmethod read-corpus ((vectors-ht hash-table)  (corpus pathname))
+(defmethod read-corpus ((vectors-ht hash-table)  (corpus pathname) feature-words)
   (with-open-file (stream corpus :direction :input)
     (loop for line = (read-line stream nil nil)
           while line
-          do (vs-learn-line-of-text vectors-ht line))
+          do (vs-learn-line-of-text vectors-ht line feature-words))
     ))
 
-(defmethod read-corpus ((vectors-ht hash-table) (corpus-lines list))
+(defmethod read-corpus ((vectors-ht hash-table) (corpus-lines list) feature-words)
   (loop for line in corpus-lines
-        do (vs-learn-line-of-text vectors-ht line)))
+        do (vs-learn-line-of-text vectors-ht line feature-words)))
 
 
 
@@ -133,18 +135,18 @@
 ;;; exported function
 ;;;==================
 
-(defmethod make-word-vectors ((words list) corpus)
+(defmethod make-word-vectors ((words list) corpus feature-words)
   
   (let ((vectors-ht (make-hash-table :test #'equal)))
+    
     (loop for w in words do
           (setf (gethash (normalize-token w) vectors-ht) 
-                (make-vs-vector)))
+                (make-list (length feature-words) :initial-element 0)))
     
-    (read-corpus vectors-ht corpus)
+    (read-corpus vectors-ht corpus feature-words)
     
-    (loop for w being the hash-keys of vectors-ht
-          for vec being the hash-values of vectors-ht
-          do (normalize-vector (vs-vector-features vec)))
+    (loop for vec being the hash-values of vectors-ht
+          do (normalize-vector vec))
     
     vectors-ht))
 
@@ -208,6 +210,5 @@
 ;;  ("sheriff" :TITLE 0.22804837))
 
 |#
-
 
 

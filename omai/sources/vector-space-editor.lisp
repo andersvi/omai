@@ -43,14 +43,16 @@
 
 (defun k-means-button (editor)
   (let ((vs (om::object-value editor)))
-    (setf (classes vs) (k-means (vectors vs) (max (length (classes vs)) 1)))
+    (setf (classes vs) (k-means vs (max (length (classes vs)) 1)))
     (cache-vs-points editor)
+    (om::report-modifications editor)
     (oa:om-invalidate-view (om::main-view editor))))
 
 (defun estimate-button (editor)
   (let ((vs (om::object-value editor)))
     (classify vs)
     (cache-vs-points editor)
+    (om::report-modifications editor)
     (oa:om-invalidate-view (om::main-view editor))))
 
 (defclass vs-2D-view (om::omeditorview) ())
@@ -96,68 +98,72 @@
                                                 (oa:om-invalidate-view (om::main-view editor))
                                                 )))
         (controller-view (oa::om-make-layout 
-                           'oa::om-column-layout 
-                           :ratios '(nil nil 1 nil nil 1 nil nil nil nil) :delta 0
-                           :subviews (list 
-                                      ;; top of the pane
-                                      (oa::om-make-di 'oa::om-popup-list :items '(:2d :3d) 
-                                                      :value (om::editor-get-edit-param editor :view-mode)
-                                                      :size (oa::omp 80 24)
-                                                      :font (oa::om-def-font :font1)
-                                                      :di-action #'(lambda (b) 
-                                                                     (om::editor-set-edit-param editor :view-mode (om::om-get-selected-item b))
-                                                                     (om::build-editor-window editor)
-                                                                     ;;; (om::init-editor-window editor) ; no need to recache everything (?)
-                                                                     (when (equal (om::editor-get-edit-param editor :view-mode) :3D)
-                                                                       (om::om-init-3D-view (om::main-view editor))
-                                                                       (om::om-set-gl-objects (om::main-view editor) (create-GL-objects editor)))
-                                                                     ))
-                                      :separator
-                                      nil
-                                      (oa::om-make-layout 
-                                       'oa::om-row-layout 
-                                       :subviews (list 
-                                                  (oa::om-make-di 'oa::om-button :text "K-means" :font (oa::om-def-font :font1) 
-                                                                  :size (oa::omp 76 24)
-                                                                  :di-action #'(lambda (b) (declare (ignore b))
-                                                                                 (init-colors editor)
-                                                                                 (k-means-button editor)))
+                          'oa::om-column-layout 
+                          :ratios '(nil nil 1 nil nil 1 nil nil nil nil) :delta 0
+                          :subviews 
+                          (list 
+                           ;; top of the pane
+                           (oa::om-make-di 'oa::om-popup-list :items '(:2d :3d) 
+                                           :value (om::editor-get-edit-param editor :view-mode)
+                                           :size (oa::omp 80 24)
+                                           :font (oa::om-def-font :font1)
+                                           :di-action #'(lambda (b) 
+                                                          (om::editor-set-edit-param editor :view-mode (om::om-get-selected-item b))
+                                                          (om::build-editor-window editor)
+                                                          ;;; (om::init-editor-window editor) ; no need to recache everything (?)
+                                                          (when (equal (om::editor-get-edit-param editor :view-mode) :3D)
+                                                            (om::om-init-3D-view (om::main-view editor))
+                                                            (om::om-set-gl-objects (om::main-view editor) (create-GL-objects editor)))
+                                                          ))
+                           :separator
+                           nil
+                           (oa::om-make-layout 
+                            'oa::om-row-layout 
+                            :subviews (list 
+                                       (oa::om-make-di 'oa::om-button :text "K-means" :font (oa::om-def-font :font1) 
+                                                       :size (oa::omp 76 24)
+                                                       :di-action #'(lambda (b) (declare (ignore b))
+                                                                      (init-colors editor)
+                                                                      (k-means-button editor)))
                                                   
-                                                  (oa::om-make-di 'oa:om-simple-text :text "N:" :font (oa::om-def-font :font1) 
-                                                                  :size (oa::omp 12 24))
-                                                  (om::set-g-component 
-                                                   editor :k-means-n 
-                                                   (oa::om-make-di 'om::numbox :font (oa::om-def-font :font1) :size (oa::omp 20 20)
-                                                                   :bg-color (oa:om-def-color :white)
-                                                                   :value (max (length (classes vs)) 1) :min-val 1
-                                                                   :after-fun #'(lambda (b)
-                                                                                  (setf (classes (om::object-value editor)) (initialize-classes (om::value b)))
-                                                                                  (oa:om-invalidate-view (om::main-view editor))))
+                                       (oa::om-make-di 'oa:om-simple-text :text "N:" :font (oa::om-def-font :font1) 
+                                                       :size (oa::omp 12 24))
+                                       (om::set-g-component 
+                                        editor :k-means-n 
+                                        (oa::om-make-di 'om::numbox :font (oa::om-def-font :font1) :size (oa::omp 20 20)
+                                                        :bg-color (oa:om-def-color :white)
+                                                        :value (max (length (classes vs)) 1) :min-val 1
+                                                        :after-fun #'(lambda (b)
+                                                                       (setf (classes (om::object-value editor)) 
+                                                                             (initialize-classes (om::value b)))
+                                                                       (cache-vs-points editor)
+                                                                       (om::report-modifications editor)
+                                                                       (oa:om-invalidate-view (om::main-view editor))))
                                                    
-                                                   )))
+                                        )))
                                       
-                                      (oa::om-make-di 'oa::om-button :text "Estimate class" :font (oa::om-def-font :font1) :size (oa::omp 100 24)
-                                                      :di-action #'(lambda (b) (declare (ignore b))
-                                                                     (estimate-button editor)))
-                                      nil
-                                      :separator
-                                      (oa::om-make-di 'oa:om-simple-text :text "x:" :font (oa::om-def-font :font1) :size (oa::omp 80 18))
-                                      x-menu
-                                      (oa::om-make-di 'oa:om-simple-text :text "y:" :font (oa::om-def-font :font1) :size (oa::omp 80 18))
-                                      y-menu
-                                      (oa::om-make-di 'oa:om-simple-text :text "z:" :font (oa::om-def-font :font1) :size (oa::omp 80 18)
-                                                      :fg-color (if (equal (om::editor-get-edit-param editor :view-mode) :3d) 
-                                                                    (oa::om-def-color :black) (oa::om-def-color :gray)))
-                                      z-menu
-                                      (oa::om-make-di 'oa:om-check-box :text "show IDs" :font (oa::om-def-font :font1) :size (oa::omp 80 18)
-                                                      :checked-p (om::editor-get-edit-param editor :show-ids)
-                                                      :di-action #'(lambda (b) 
-                                                                     (om::editor-set-edit-param editor :show-ids (om-api:om-checked-p b))
-                                                                     (oa:om-invalidate-view (om::main-view editor))
-                                                                     ))
+                           (oa::om-make-di 'oa::om-button :text "Estimate class" :font (oa::om-def-font :font1) :size (oa::omp 100 24)
+                                           :di-action #'(lambda (b) (declare (ignore b))
+                                                          (estimate-button editor)))
+                           nil
+                           :separator
+                           (oa::om-make-di 'oa:om-simple-text :text "x:" :font (oa::om-def-font :font1) :size (oa::omp 80 18))
+                           x-menu
+                           (oa::om-make-di 'oa:om-simple-text :text "y:" :font (oa::om-def-font :font1) :size (oa::omp 80 18))
+                           y-menu
+                           (oa::om-make-di 'oa:om-simple-text :text "z:" :font (oa::om-def-font :font1) :size (oa::omp 80 18)
+                                           :fg-color (if (equal (om::editor-get-edit-param editor :view-mode) :3d) 
+                                                         (oa::om-def-color :black) (oa::om-def-color :gray)))
+                           z-menu
+                           (oa::om-make-di 'oa:om-check-box :text "show IDs" :font (oa::om-def-font :font1) :size (oa::omp 80 18)
+                                           :checked-p (om::editor-get-edit-param editor :show-ids)
+                                           :di-action #'(lambda (b) 
+                                                          (om::editor-set-edit-param editor :show-ids (om-api:om-checked-p b))
+                                                          (oa:om-invalidate-view (om::main-view editor))
+                                                          ))
                                       
-                                      ))
-                          ))
+                           ))
+                         ))
     
     (om::set-g-component editor :x-menu x-menu)
     (om::set-g-component editor :y-menu y-menu)
@@ -253,37 +259,29 @@
          (oa:om-invalidate-view (om::main-view editor)))
     (otherwise (call-next-method))))
 
+
 ;;; Fill cached points and record the min-max range for each dimension
 ;;; call this each time display dimensions are modified
 (defun cache-vs-points (editor)
-  
-  ;(print "CACHING VS POINTS...")
-  
-  (let ((vs (om::object-value editor))
-        (d1 (om::editor-get-edit-param editor :dimension1))
-        (d2 (om::editor-get-edit-param editor :dimension2))
-        (d3 (om::editor-get-edit-param editor :dimension3)))
     
-    ;(print "DIMENSIONS:")
-    ;(print d1)
-    ;(print d2)
-    ;(print d3)
-    
+  (let* ((vs (om::object-value editor))
+         (d1 (om::editor-get-edit-param editor :dimension1))
+         (p1 (position d1 (features vs) :test 'equal))
+         (d2 (om::editor-get-edit-param editor :dimension2))
+         (p2 (position d2 (features vs) :test 'equal))
+         (d3 (om::editor-get-edit-param editor :dimension3))
+         (p3 (position d3 (features vs) :test 'equal)))
+  
     (setf (cached-ranges editor) 
           (list (list nil nil) (list nil nil) (list nil nil)))
 
     (loop for vector-id being the hash-key of (vectors vs)
           for vector being the hash-value of (vectors vs)
           for i from 0
-          do (let* ((v (vs-vector-features vector))
-                    ;(v1 (gethash d1 v))
-                    ;(v2 (gethash d2 v))
-                    ;(v3 (gethash d3 v))
-                    (v1 (or (gethash d1 v) 0))
-                    (v2 (or (gethash d2 v) 0))
-                    (v3 (or (gethash d3 v) 0))
-                    )
-       
+          do (let* ((v1 (or (nth p1 vector) 0))
+                    (v2 (or (nth p2 vector) 0))
+                    (v3 (or (nth p3 vector) 0)))
+               
                (setf (aref (cached-points editor) i)
                      (make-cached-point 
                       :id vector-id 
@@ -291,8 +289,8 @@
                                                :initial-contents (list v1 v2 v3))
                       :class (let ((c (find vector-id (classes vs) 
                                             :test #'(lambda (id class)
-                                                      (find id (vs-class-members class) :test 'equal))))) ;;; find class
-                               (and c (vs-class-label c)))))
+                                                      (find id (members class) :test 'equal))))) ;;; find class
+                               (and c (label c)))))
                (when v1 
                  (let ((range (nth 0 (cached-ranges editor))))
                    (when  (or (null (car range)) (< v1 (car range)))
@@ -352,11 +350,10 @@
             for color = (when (cached-point-class p)
                           (let ((pos (position (cached-point-class p)
                                                (classes (om::object-value (om::editor self)))
-                                               :key 'vs-class-label)))
+                                               :key 'label)))
                             (when pos (nth pos (class-colors (om::editor self))))))
             do
-            (oa:om-draw-circle x y r :fill t
-                               :color color)
+            (oa:om-draw-circle x y r :fill t :color color)
             (when (om::editor-get-edit-param (om::editor self) :show-ids)
               (oa:om-draw-string (+ x 4) (+ y 2) (cached-point-id p) :color (or color (oa::om-def-color :gray))))
             )
@@ -435,7 +432,7 @@
             for color = (when (cached-point-class p)
                           (let ((pos (position (cached-point-class p)
                                                (classes (om::object-value self))
-                                               :key 'vs-class-label)))
+                                               :key 'label)))
                             (when pos (nth pos (class-colors self)))))
             collect
             (make-instance 'om::3d-sphere :center (list x y z) :size r 
