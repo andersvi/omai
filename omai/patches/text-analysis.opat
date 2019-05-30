@@ -1,11 +1,11 @@
 
 (:patch
  (:om-version 0.0106999995)
- (:name "text-analysis")
+ (:name "Untitled")
  (:doc "")
  (:info
   (:created "2018/11/12 21:50:08")
-  (:modified "2019/05/30 13:04:45"))
+  (:modified "2019/05/30 14:58:39"))
  (:window (:size (1025 802)) (:position (548 157)))
  (:grid nil)
  (:lock nil)
@@ -16282,8 +16282,8 @@
    (:type :value)
    (:group-id nil)
    (:name "value box")
-   (:x 68)
-   (:y 354)
+   (:x 170)
+   (:y 262)
    (:w 76)
    (:h 30)
    (:color
@@ -16297,36 +16297,6 @@
    (:outputs (:output (:name "value") (:reactive nil)))
    (:value "bread")
    (:id 9))
-  (:box
-   (:library "omai")
-   (:reference (:symbol "VECTOR-FEATURES" "OMAI"))
-   (:type :function)
-   (:group-id nil)
-   (:name "vector-features")
-   (:x 31)
-   (:y 386)
-   (:w 113)
-   (:h 30)
-   (:color nil)
-   (:border nil)
-   (:roundness nil)
-   (:text-font nil)
-   (:align nil)
-   (:lock nil)
-   (:lambda nil)
-   (:inputs
-    (:input
-     (:type :standard)
-     (:name "SELF")
-     (:value nil)
-     (:reactive nil))
-    (:input
-     (:type :standard)
-     (:name "THING")
-     (:value nil)
-     (:reactive nil)))
-   (:outputs (:output (:name "out") (:reactive nil)))
-   (:id 10))
   (:box
    (:reference (:symbol "MAKE-WORD-VECTORS" "OMAI"))
    (:type :function)
@@ -16360,7 +16330,7 @@
      (:value nil)
      (:reactive nil)))
    (:outputs (:output (:name "out") (:reactive nil)))
-   (:id 11))
+   (:id 10))
   (:box
    (:reference pathname)
    (:type :value)
@@ -16400,7 +16370,7 @@
      (:host nil)
      (:name "text")
      (:type "txt")))
-   (:id 12))
+   (:id 11))
   (:box
    (:library "omai")
    (:reference (:symbol "GET-SIMILARITY" "OMAI"))
@@ -16435,7 +16405,7 @@
      (:value nil)
      (:reactive nil)))
    (:outputs (:output (:name "out") (:reactive nil)))
-   (:id 13))
+   (:id 12))
   (:box
    (:library "omai")
    (:reference (:symbol "GET-CLASS" "OMAI"))
@@ -16465,7 +16435,7 @@
      (:value nil)
      (:reactive nil)))
    (:outputs (:output (:name "out") (:reactive nil)))
-   (:id 14))
+   (:id 13))
   (:box
    (:reference textbuffer)
    (:type :object)
@@ -16530,7 +16500,7 @@
          "university"
          "sheriff"))))
      (:add-slots ((:input-mode :lines-cols)))))
-   (:id 15))
+   (:id 14))
   (:comment
    (:x 875)
    (:y 219)
@@ -16543,7 +16513,7 @@
    (:text-font nil)
    (:align nil)
    (:text "\"unknown\" words")
-   (:id 16))
+   (:id 15))
   (:box
    (:reference textbuffer)
    (:type :object)
@@ -16715,7 +16685,7 @@
          "minister"
          "sheriff"))))
      (:add-slots ((:input-mode :lines-cols)))))
-   (:id 17))
+   (:id 16))
   (:box
    (:library "omai")
    (:reference (:symbol "ESTIMATE-CLASS" "OMAI"))
@@ -16747,7 +16717,7 @@
    (:outputs
     (:output (:name "out0") (:reactive nil))
     (:output (:name "out1") (:reactive nil)))
-   (:id 18))
+   (:id 17))
   (:box
    (:reference cons)
    (:type :value)
@@ -16777,7 +16747,7 @@
      (:reactive nil)))
    (:outputs (:output (:name "value") (:reactive nil)))
    (:value (:list :title 0.2173701))
-   (:id 19))
+   (:id 18))
   (:box
    (:reference textbuffer)
    (:type :object)
@@ -16944,7 +16914,7 @@
          "   \"edward\")))"
          ""))))
      (:add-slots ((:input-mode :lines-cols)))))
-   (:id 20))
+   (:id 19))
   (:box
    (:reference mapcar)
    (:type :function)
@@ -16973,7 +16943,7 @@
      (:value nil)
      (:reactive nil)))
    (:outputs (:output (:name "out") (:reactive nil)))
-   (:id 21))
+   (:id 20))
   (:box
    (:library "omai")
    (:reference (:symbol "ESTIMATE-CLASS" "OMAI"))
@@ -17005,7 +16975,7 @@
    (:outputs
     (:output (:name "out0") (:reactive nil))
     (:output (:name "out1") (:reactive nil)))
-   (:id 22))
+   (:id 21))
   (:box
    (:reference list)
    (:type :function)
@@ -17030,7 +17000,7 @@
      (:value nil)
      (:reactive nil)))
    (:outputs (:output (:name "out") (:reactive nil)))
-   (:id 23))
+   (:id 22))
   (:box
    (:reference mat-trans)
    (:type :function)
@@ -17054,7 +17024,7 @@
      (:value nil)
      (:reactive nil)))
    (:outputs (:output (:name "out") (:reactive nil)))
-   (:id 24))
+   (:id 23))
   (:box
    (:reference cons)
    (:type :value)
@@ -17095,7 +17065,7 @@
      (:list "senator" :title)
      (:list "university" :institution)
      (:list "sheriff" :title)))
-   (:id 25))
+   (:id 24))
   (:comment
    (:x 269)
    (:y 13)
@@ -17112,7 +17082,7 @@
    (:align nil)
    (:text
     "VECTOR-SPACE: an application with text analysis and word classification")
-   (:id 26))
+   (:id 25))
   (:comment
    (:x 648)
    (:y 66)
@@ -17125,13 +17095,13 @@
    (:text-font nil)
    (:align nil)
    (:text "\"known\" word classes")
-   (:id 27))
+   (:id 26))
   (:box
    (:reference list-selection)
    (:type :interface)
    (:group-id nil)
    (:name "list-selection")
-   (:x 11)
+   (:x 5)
    (:y 435)
    (:w 145)
    (:h 253)
@@ -17144,7 +17114,7 @@
    (:inputs
     (:input (:type :key) (:name "items") (:value nil) (:reactive nil)))
    (:outputs (:output (:name "value") (:reactive nil)))
-   (:value (:list "vegetables" 0.0))
+   (:value (:list "salt" 0.0))
    (:items
     (:list
      (:list "potato" 0.0)
@@ -17269,122 +17239,215 @@
      (:list "university" 0.0)
      (:list "minister" 0.0)
      (:list "sheriff" 0.0)))
-   (:selection (:list 11))
-   (:id 28)))
+   (:selection (:list 13))
+   (:id 27))
+  (:box
+   (:library "omai")
+   (:reference (:symbol "GET-FEATURE-VALUES" "OMAI"))
+   (:type :function)
+   (:group-id nil)
+   (:name "get-feature-values")
+   (:x 20)
+   (:y 334)
+   (:w 128)
+   (:h 30)
+   (:color nil)
+   (:border nil)
+   (:roundness nil)
+   (:text-font nil)
+   (:align nil)
+   (:lock :eval-once)
+   (:lambda nil)
+   (:inputs
+    (:input
+     (:type :standard)
+     (:name "SELF")
+     (:value nil)
+     (:reactive nil))
+    (:input
+     (:type :standard)
+     (:name "VECTOR")
+     (:value nil)
+     (:reactive nil)))
+   (:outputs
+    (:output (:name "out0") (:reactive nil))
+    (:output (:name "out1") (:reactive nil)))
+   (:id 28))
+  (:box
+   (:reference list)
+   (:type :function)
+   (:group-id nil)
+   (:name "list")
+   (:x 56)
+   (:y 369)
+   (:w 52)
+   (:h 30)
+   (:color nil)
+   (:border nil)
+   (:roundness nil)
+   (:text-font nil)
+   (:align nil)
+   (:lock nil)
+   (:lambda nil)
+   (:inputs
+    (:input (:type :optional) (:name "x") (:value nil) (:reactive nil))
+    (:input
+     (:type :optional)
+     (:name "x")
+     (:value nil)
+     (:reactive nil)))
+   (:outputs (:output (:name "out") (:reactive nil)))
+   (:id 29))
+  (:box
+   (:reference mat-trans)
+   (:type :function)
+   (:group-id nil)
+   (:name "mat-trans")
+   (:x 34)
+   (:y 399)
+   (:w 86)
+   (:h 30)
+   (:color nil)
+   (:border nil)
+   (:roundness nil)
+   (:text-font nil)
+   (:align nil)
+   (:lock nil)
+   (:lambda nil)
+   (:inputs
+    (:input
+     (:type :standard)
+     (:name "MATRIX")
+     (:value nil)
+     (:reactive nil)))
+   (:outputs (:output (:name "out") (:reactive nil)))
+   (:id 30)))
  (:connections
-  (:connection
-   (:from (:box 0 :out 0))
-   (:to (:box 10 :in 0))
-   (:attributes (:color nil :style nil :modif nil)))
-  (:connection
-   (:from (:box 0 :out 0))
-   (:to (:box 14 :in 0))
-   (:attributes (:color nil :style nil :modif nil)))
   (:connection
    (:from (:box 0 :out 0))
    (:to (:box 13 :in 0))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
    (:from (:box 0 :out 0))
-   (:to (:box 18 :in 0))
-   (:attributes (:color nil :style nil :modif nil)))
-  (:connection
-   (:from (:box 0 :out 0))
-   (:to (:box 22 :in 0))
-   (:attributes (:color nil :style nil :modif nil)))
-  (:connection
-   (:from (:box 2 :out 0))
    (:to (:box 12 :in 0))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
-   (:from (:box 4 :out 0))
-   (:to (:box 18 :in 1))
+   (:from (:box 0 :out 0))
+   (:to (:box 17 :in 0))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
-   (:from (:box 4 :out 0))
-   (:to (:box 14 :in 1))
+   (:from (:box 0 :out 0))
+   (:to (:box 21 :in 0))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
-   (:from (:box 5 :out 0))
-   (:to (:box 13 :in 1))
-   (:attributes (:color nil :style nil :modif nil)))
-  (:connection
-   (:from (:box 6 :out 0))
-   (:to (:box 13 :in 2))
-   (:attributes (:color nil :style nil :modif nil)))
-  (:connection
-   (:from (:box 9 :out 0))
-   (:to (:box 10 :in 1))
-   (:attributes (:color nil :style nil :modif nil)))
-  (:connection
-   (:from (:box 10 :out 0))
+   (:from (:box 0 :out 0))
    (:to (:box 28 :in 0))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
-   (:from (:box 11 :out 0))
-   (:to (:box 0 :in 1))
-   (:attributes (:color nil :style nil :modif nil)))
-  (:connection
-   (:from (:box 12 :out 0))
-   (:to (:box 1 :in 0))
-   (:attributes (:color nil :style nil :modif nil)))
-  (:connection
-   (:from (:box 12 :out 0))
-   (:to (:box 11 :in 1))
-   (:attributes (:color nil :style nil :modif nil)))
-  (:connection
-   (:from (:box 13 :out 0))
-   (:to (:box 7 :in 0))
-   (:attributes (:color nil :style nil :modif nil)))
-  (:connection
-   (:from (:box 14 :out 0))
-   (:to (:box 8 :in 0))
-   (:attributes (:color nil :style nil :modif nil)))
-  (:connection
-   (:from (:box 15 :out 1))
-   (:to (:box 21 :in 1))
-   (:attributes (:color nil :style nil :modif nil)))
-  (:connection
-   (:from (:box 15 :out 1))
-   (:to (:box 23 :in 0))
-   (:attributes (:color nil :style nil :modif nil)))
-  (:connection
-   (:from (:box 17 :out 1))
+   (:from (:box 2 :out 0))
    (:to (:box 11 :in 0))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
-   (:from (:box 17 :out 1))
-   (:to (:box 11 :in 2))
+   (:from (:box 4 :out 0))
+   (:to (:box 17 :in 1))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
-   (:from (:box 17 :out 1))
+   (:from (:box 4 :out 0))
+   (:to (:box 13 :in 1))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 5 :out 0))
+   (:to (:box 12 :in 1))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 6 :out 0))
+   (:to (:box 12 :in 2))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 9 :out 0))
+   (:to (:box 28 :in 1))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 10 :out 0))
+   (:to (:box 0 :in 1))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 11 :out 0))
+   (:to (:box 1 :in 0))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 11 :out 0))
+   (:to (:box 10 :in 1))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 12 :out 0))
+   (:to (:box 7 :in 0))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 13 :out 0))
+   (:to (:box 8 :in 0))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 14 :out 1))
+   (:to (:box 20 :in 1))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 14 :out 1))
+   (:to (:box 22 :in 0))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 16 :out 1))
+   (:to (:box 10 :in 0))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 16 :out 1))
+   (:to (:box 10 :in 2))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 16 :out 1))
    (:to (:box 0 :in 2))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
-   (:from (:box 18 :out 0))
-   (:to (:box 19 :in 0))
+   (:from (:box 17 :out 0))
+   (:to (:box 18 :in 0))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
-   (:from (:box 18 :out 1))
-   (:to (:box 19 :in 1))
+   (:from (:box 17 :out 1))
+   (:to (:box 18 :in 1))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
-   (:from (:box 20 :out 1))
+   (:from (:box 19 :out 1))
    (:to (:box 0 :in 3))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
+   (:from (:box 20 :out 0))
+   (:to (:box 22 :in 1))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
    (:from (:box 21 :out 0))
-   (:to (:box 23 :in 1))
+   (:to (:box 20 :in 0))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
    (:from (:box 22 :out 0))
-   (:to (:box 21 :in 0))
+   (:to (:box 23 :in 0))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
    (:from (:box 23 :out 0))
    (:to (:box 24 :in 0))
    (:attributes (:color nil :style nil :modif nil)))
   (:connection
-   (:from (:box 24 :out 0))
-   (:to (:box 25 :in 0))
+   (:from (:box 28 :out 0))
+   (:to (:box 29 :in 1))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 28 :out 1))
+   (:to (:box 29 :in 0))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 29 :out 0))
+   (:to (:box 30 :in 0))
+   (:attributes (:color nil :style nil :modif nil)))
+  (:connection
+   (:from (:box 30 :out 0))
+   (:to (:box 27 :in 0))
    (:attributes (:color nil :style nil :modif nil)))))
