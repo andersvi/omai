@@ -5,7 +5,7 @@
  (:doc "")
  (:info
   (:created "2018/11/12 21:50:08")
-  (:modified "2019/05/30 12:54:22"))
+  (:modified "2019/05/30 13:04:45"))
  (:window (:size (1025 802)) (:position (548 157)))
  (:grid nil)
  (:lock nil)
@@ -29,7 +29,7 @@
    (:display :text)
    (:showname nil)
    (:group-id nil)
-   (:lock :locked)
+   (:lock nil)
    (:lambda nil)
    (:inputs
     (:input
@@ -15335,9 +15335,6 @@
            ((:label :foodstuff)
             (:members
              (:list
-              "fruit"
-              "butter"
-              "pepper"
               "potato"
               "food"
               "bread"
@@ -15491,9 +15488,6 @@
            ((:label :institution)
             (:members
              (:list
-              "department"
-              "university"
-              "california"
               "administration"
               "institute"
               "college"
@@ -15637,12 +15631,6 @@
            ((:label :title)
             (:members
              (:list
-              "hiroshima"
-              "sheriff"
-              "peter"
-              "moscow"
-              "senator"
-              "roosevelt"
               "producer"
               "professor"
               "dr"
@@ -15793,8 +15781,6 @@
            ((:label :place_name)
             (:members
              (:list
-              "asia"
-              "egypt"
               "italy"
               "dallas"
               "france"
@@ -15953,7 +15939,6 @@
            ((:label :person_name)
             (:members
              (:list
-              "robert"
               "lizzie"
               "david"
               "bill"
@@ -16268,7 +16253,7 @@
    (:value 0.16162706)
    (:id 7))
   (:box
-   (:reference null)
+   (:reference symbol)
    (:type :value)
    (:group-id nil)
    (:name "value box")
@@ -17159,7 +17144,7 @@
    (:inputs
     (:input (:type :key) (:name "items") (:value nil) (:reactive nil)))
    (:outputs (:output (:name "value") (:reactive nil)))
-   (:value nil)
+   (:value (:list "vegetables" 0.0))
    (:items
     (:list
      (:list "potato" 0.0)
@@ -17284,7 +17269,7 @@
      (:list "university" 0.0)
      (:list "minister" 0.0)
      (:list "sheriff" 0.0)))
-   (:selection nil)
+   (:selection (:list 11))
    (:id 28)))
  (:connections
   (:connection
