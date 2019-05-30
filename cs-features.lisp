@@ -17,6 +17,37 @@
 		 :ldur (loop repeat n collect (om-random 10 500)))))
     cs))
 
+(defun modulo-fit (val modulo lo hi)
+  (cond ((<= lo val hi) val)
+	((< val hi) (+ lo (mod (- val lo) modulo)))
+	(t (modulo-fit (- val modulo) modulo lo hi))))
+
+(defun harmonic-cs2 (&optional (n 100) (lo 6000) (hi 8400))
+  (let* ((pat (p-weighting '((0 :weight 1)		    ;uses Patterns lib
+			     (1 :weight 30)
+			     (2 :weight 1)
+			     (4 :weight 3)
+			     (4 :weight 3)
+			     (7 :weight 8)
+			     (8 :weight 0)
+			     (9 :weight 2)))))
+    (mki 'chord-seq
+	 :lmidic (loop
+		    with f = 6000
+		    repeat n
+		    for intervall = (* (nth-random '(-1 1))
+				       (p-next pat))
+		    for mc = (setf f (modulo-fit (+ f (* 100 intervall))
+						 1200 lo hi))
+		    collect mc)
+	 :lvel  (loop repeat n collect (om-random 10 127))
+	 :lonset '(0 100)
+	 :ldur (loop repeat n collect (om-random 10 500)))))
+
+;; (flat (lmidic (harmonic-cs2 100 6000 )))
+
+;; (omai::dominant-spread (lmidic (harmonic-cs2)))
+
 (defun cs->fvecs (cs)
   (mat-trans
    (mapcar #'(lambda (l) (om-scale (flat l) 0.0 1.0))
@@ -36,19 +67,19 @@
 		   (flat l)))
 	   (mapcar #'(lambda (p) (funcall p self)) parameter-list))))
 
-(defun split-cs-by-features (cs k)
-  (let ((parameter-list '(lmidic ldur lvel)))
-    ))
+;; (defun split-cs-by-features (cs k)
+;;   (let ((parameter-list '(lmidic ldur lvel)))
+;;     ))
 
-(defclass chord-w-class (chord)
-  ((class :initarg nil :class :accessor class)))
+;; (defclass chord-w-class (chord)
+;;   ((class :initarg nil :class :accessor class)))
 
-(mki 'chord-w-class)
+;; (mki 'chord-w-class)
 
-(let ((a (mki 'chord-seq)))
-  (setf (inside a) (loop repeat 10 collect (mki 'chord-w-class :ldur (random 10) :lmidic (* 100 (om-random 48 72)))))
-  (setf (lonset a) '(0 100))
-  (lonset a))
+;; (let ((a (mki 'chord-seq)))
+;;   (setf (inside a) (loop repeat 10 collect (mki 'chord-w-class :ldur (random 10) :lmidic (* 100 (om-random 48 72)))))
+;;   (setf (lonset a) '(0 100))
+;;   (lonset a))
 
 (defmethod extract-feature-vectors ((self chord-seq) &optional (parameter-list '(lmidic ldur lvel)) (normalize t))
   (mat-trans

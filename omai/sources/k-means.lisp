@@ -68,7 +68,7 @@
 (defun lloyd-km (vectors cluster-map centroids k size)
   
   (declare (type hash-table vectors)
-           (type list clusters centroids)
+           (type list cluster-map centroids)
            (type integer k))
 
   (let ((new-cluster-map (get-cluster-map vectors centroids)))
@@ -85,7 +85,7 @@
 
 
 ;;================================
-; returns a list of cluser: each cluster is a hash-table of vectors
+; returns a list of cluster: each cluster is a hash-table of vectors
 (defun make-clusters (clusters-map vectors k)
   (let ((clusters (make-list k)))
     (loop for elt in clusters-map do
@@ -134,7 +134,7 @@
  
       (progn (format t "k >= observations !!") nil)
     
-    (if (= (hash-table-count vectors) k) 
+      (if (= (hash-table-count vectors) k) 
         
         ;;; just make one class with each observation vector
         (loop for element being the hash-keys of vectors
@@ -164,6 +164,8 @@
   :outdoc '("list of vs-class objects")
   :initvals '(nil 2)
   (compute-k-means (vectors self) k (length (features self))))
+
+
 
 #|
 
