@@ -57,8 +57,8 @@ Allowed input formats for <classes> are:
 
 (defmethod initialize-instance :after ((self vector-space) &rest args)
   
-  (setf (vectors self) (initialize-vector-space (vectors self) (features self)))
-  
+  (setf (vectors self) (initialize-vector-space (vectors self)))
+  (setf (features self) (initialize-features (features self) (vectors self)))
   (setf (classes self) (initialize-classes (classes self)))
   
   (compute-class-centroids self)
@@ -90,9 +90,9 @@ Allowed input formats for <classes> are:
 ; if the input is a hash-table we supposed it is already ok 
 ; this happens for instance when copying from another vector-space's vector slot, 
 ; or when reloading the object
-(defmethod initialize-vector-space ((input hash-table) features) input)
+(defmethod initialize-vector-space ((input hash-table)) input)
 
-(defmethod initialize-vector-space ((input list) features)
+(defmethod initialize-vector-space ((input list))
    
   (let ((vectors (make-hash-table :test 'equal)))
     
@@ -103,6 +103,19 @@ Allowed input formats for <classes> are:
                (setf (gethash id vectors) vector)))
     
     vectors))
+
+(defmethod initialize-features ((features list) (vector-ht hash-table))
+  
+  (let ((max-vector-size (print (loop for vect being the hash-values in vector-ht
+                               maximize (length vect)))))
+    
+    (if (< (length features) max-vector-size)
+        (print (append features 
+                       (loop for i from (1+ (length features))
+                             to max-vector-size
+                             collect (format nil "feat_~D" i))))
+        features)
+    ))
 
 ;;;=================
 ;;; UTILS/ACCESSORS

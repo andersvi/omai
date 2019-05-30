@@ -278,9 +278,9 @@
     (loop for vector-id being the hash-key of (vectors vs)
           for vector being the hash-value of (vectors vs)
           for i from 0
-          do (let* ((v1 (or (nth p1 vector) 0))
-                    (v2 (or (nth p2 vector) 0))
-                    (v3 (or (nth p3 vector) 0)))
+          do (let* ((v1 (or (and p1 (nth p1 vector)) 0))
+                    (v2 (or (and p2 (nth p2 vector)) 0))
+                    (v3 (or (and p3 (nth p3 vector)) 0)))
                
                (setf (aref (cached-points editor) i)
                      (make-cached-point 
