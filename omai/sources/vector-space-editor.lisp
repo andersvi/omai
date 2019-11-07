@@ -128,19 +128,27 @@
                                                   
                                        (oa::om-make-di 'oa:om-simple-text :text "N:" :font (oa::om-def-font :font1) 
                                                        :size (oa::omp 12 24))
-                                       (om::set-g-component 
-                                        editor :k-means-n 
-                                        (oa::om-make-di 'om::numbox :font (oa::om-def-font :font1) :size (oa::omp 20 20)
-                                                        :bg-color (oa:om-def-color :white)
-                                                        :value (max (length (classes vs)) 1) :min-val 1
+                                       
+                                       (om::om-make-view 'om::om-view
+                                                         :size (oa::omp 20 20)
+                                                         :subviews 
+                                                         (list 
+                                                          (om::set-g-component 
+                                                           editor :k-means-n 
+                                                           (oa::om-make-di 'om::numbox :font (oa::om-def-font :font1) 
+                                                                           :size (oa::omp 20 20)
+                                                                           :bg-color (oa:om-def-color :white)
+                                                                           :value (max (length (classes vs)) 1) :min-val 1
                                                         :after-fun #'(lambda (b)
                                                                        (setf (classes (om::object-value editor)) 
                                                                              (initialize-classes (om::value b)))
                                                                        (cache-vs-points editor)
                                                                        (om::report-modifications editor)
                                                                        (oa:om-invalidate-view (om::main-view editor))))
+                                                           ))
                                                    
-                                        )))
+                                                         )
+                            ))
                                       
                            (oa::om-make-di 'oa::om-button :text "Estimate class" :font (oa::om-def-font :font1) :size (oa::omp 100 24)
                                            :di-action #'(lambda (b) (declare (ignore b))
@@ -355,7 +363,7 @@
             do
             (oa:om-draw-circle x y r :fill t :color color)
             (when (om::editor-get-edit-param (om::editor self) :show-ids)
-              (oa:om-draw-string (+ x 4) (+ y 2) (cached-point-id p) :color (or color (oa::om-def-color :gray))))
+              (oa:om-draw-string (+ x 4) (+ y 2) (string (cached-point-id p)) :color (or color (oa::om-def-color :gray))))
             )
       )))
 
