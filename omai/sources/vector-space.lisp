@@ -339,7 +339,10 @@ This function does not make any estimation, so the class of <thing> can be NIL i
   :numouts 2
   :doc "Returns a best-guess for the class of <thing> among vector-space classes.
 
-This function doesn't consider the actual/current classification of <thing> (if any) and tests the vector against all classes in <self>, computing their centroids if necessary."
+If <thing> is a vector ID (string/symbol) then it is supposed to be a vector already inside <self>.
+In this case the function doesn't consider the actual/current classification of <thing> (if any) and tests the vector against all classes in <self>, computing their centroids if necessary.
+
+If <thing> is a list, then it is considered a new vector which can be compared to other vectors in <self>."
 
   (let ((vector (gethash thing (vectors self))))
     
@@ -356,6 +359,18 @@ This function doesn't consider the actual/current classification of <thing> (if 
       
       (om::om-beep-msg "~A not found in vector space" thing))))
 
+
+(om::defmethod! estimate-class ((self vector-space) (thing list))
+ 
+  (let* ((vector thing)
+         (scores (sort 
+                  (loop for class in (classes self) 
+                        do (unless (centroid class)
+                             (compute-class-centroid class (vectors self) (features self)))
+                        collect (list (label class)
+                                      (class-likelihood vector class (similarity-fn self))))
+                  '> :key 'cadr)))
+    (values-list (car scores))))
 
 
 (defmethod classify ((self vector-space))
