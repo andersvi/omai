@@ -232,7 +232,7 @@ The second output returns the list of features."
 (om::defmethod! get-similarity ((self vector-space) thing1 thing2)
   :icon :omai
   :indoc '("a vector-space" "label/id for vector 1" "label/id for vector 2")
-  :doc "Retruns a measure of similarity between <thing1> and <thing2> in teh vector space (using the vectir space similarity-function)"
+  :doc "Retruns a measure of similarity between <thing1> and <thing2> in the vector space (using the vectir space similarity-function)"
   (vector-similarity (vectors self) thing1 thing2 (similarity-fn self)))
 
 ;;;=================
@@ -316,10 +316,9 @@ This function does not make any estimation, so the class of <thing> can be NIL i
     
   (let* ((class-vectors (loop for member-id in (members class)
                               collect (get-feature-vector vectors member-id))))
-
-    (setf (centroid class) (compute-centroids class-vectors features)))
-  
-  class)
+    (setf (centroid class) (compute-centroids class-vectors features))
+    
+  class))
 
 
 (defmethod compute-class-centroids ((self vector-space))  
