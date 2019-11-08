@@ -239,7 +239,7 @@ The second output returns the list of features."
 ;;; CLASSES
 ;;;=================
 
-(defclass vs-class () 
+(om::defclass! vs-class () 
   ((label :accessor label :initarg :label :initform nil)
    (members :accessor members :initarg :members :initform nil)
    (centroid :accessor centroid :initarg :centroid :initform nil)))
