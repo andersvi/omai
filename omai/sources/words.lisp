@@ -129,6 +129,10 @@
   (loop for line in corpus-lines
         do (vs-learn-line-of-text vectors-ht line feature-words)))
 
+(defmethod read-corpus ((vectors-ht hash-table) (corpus-lines om:textbuffer) feature-words)
+  (loop for line in corpus-lines
+        do (vs-learn-line-of-text vectors-ht line feature-words)))
+
 
 
 ;;;==================
