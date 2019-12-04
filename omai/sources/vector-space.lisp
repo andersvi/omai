@@ -331,7 +331,7 @@ This function does not make any estimation, so the class of <thing> can be NIL i
   (funcall sim-fn vector (normalized-vector (centroid class))))
 
 
-(om::defmethod! estimate-class ((self vector-space) thing)
+(om::defmethod! estimate-class ((self vector-space) thing &optional (n-results 1))
   :icon :omai
   :indoc '("a vector-space" "a vector id/label")
   :outdoc '("the label of the estimated class" "the corresponding score")
@@ -345,31 +345,43 @@ If <thing> is a list, then it is considered a new vector which can be compared t
 
   (let ((vector (gethash thing (vectors self))))
     
+    
     (if vector
         
-        (let ((scores (sort 
+        (let ((scores (sort
                        (loop for class in (classes self) 
-                             do (unless (centroid class)
-                                  (compute-class-centroid class (vectors self) (features self)))
-                             collect (list (label class)
-                                           (class-likelihood vector class (similarity-fn self))))
+                          do (unless (centroid class)
+                               (compute-class-centroid class (vectors self) (features self)))
+                          collect (list (label class)
+                                        (class-likelihood vector class (similarity-fn self))))
                        '> :key 'cadr)))
-          (values-list (car scores)))
-      
-      (om::om-beep-msg "~A not found in vector space" thing))))
+          ;;(print (list thing scores))
+	  (values-list (loop
+			  repeat (min (length scores) n-results)
+			  for this in scores
+			  collect this)))
+	
+	(om::om-beep-msg "~A not found in vector space" thing))
+    ))
 
 
-(om::defmethod! estimate-class ((self vector-space) (thing list))
- 
+(om::defmethod! estimate-class ((self vector-space) (thing list) &optional (n-results 1))
+
   (let* ((vector thing)
          (scores (sort 
                   (loop for class in (classes self) 
-                        do (unless (centroid class)
-                             (compute-class-centroid class (vectors self) (features self)))
-                        collect (list (label class)
-                                      (class-likelihood vector class (similarity-fn self))))
+                     do (unless (centroid class)
+                          (compute-class-centroid class (vectors self) (features self)))
+                     collect (list (label class)
+                                   (class-likelihood vector class (similarity-fn self))))
                   '> :key 'cadr)))
-    (values-list (car scores))))
+    ;; 
+    ;;(break)
+    ;;(print (list 'scores scores))
+    (values-list (loop
+		    repeat (min (length scores) n-results)
+		    for this in scores
+		    collect this))))
 
 
 (defmethod classify ((self vector-space))
