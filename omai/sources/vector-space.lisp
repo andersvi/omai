@@ -356,10 +356,10 @@ If <thing> is a list, then it is considered a new vector which can be compared t
                                         (class-likelihood vector class (similarity-fn self))))
                        '> :key 'cadr)))
           ;;(print (list thing scores))
-	  (values-list (loop
-			  repeat (min (length scores) n-results)
-			  for this in scores
-			  collect this)))
+	  (loop
+	     repeat (min (length scores) n-results)
+	     for this in scores
+	     collect this))
 	
 	(om::om-beep-msg "~A not found in vector space" thing))
     ))
@@ -378,10 +378,10 @@ If <thing> is a list, then it is considered a new vector which can be compared t
     ;; 
     ;;(break)
     ;;(print (list 'scores scores))
-    (values-list (loop
-		    repeat (min (length scores) n-results)
-		    for this in scores
-		    collect this))))
+    (loop
+       repeat (min (length scores) n-results)
+       for this in scores
+       collect this)))
 
 
 (defmethod classify ((self vector-space))
