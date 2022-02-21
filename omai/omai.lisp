@@ -22,7 +22,7 @@
 
 (in-package :om)
 
-(om::set-lib-release 1.0 (find-library "omai"))
+;; (om::set-lib-release 1.0 (find-library "omai"))
 
 (compile&load (merge-pathnames "sources/package" *load-pathname*))
 (compile&load (merge-pathnames "sources/features" *load-pathname*))
